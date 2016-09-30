@@ -397,27 +397,31 @@ namespace dma {
 } // namespace dma
 
 
-namespace BB {
-	template<uint32_t addr, uint32_t bit>
-	class from_address
-	{
-	public:
-		static const bool is_sram	= (uint32_t)addr >= SRAM_BASE && ((uint32_t)addr - SRAM_BASE) < 0x80000;
-		static const bool is_periph	= (uint32_t)addr >= PERIPH_BASE && ((uint32_t)addr - PERIPH_BASE) < 0x80000;
-	
-		static const uint32_t to_bb	= PERIPH_BB_BASE + ((uint32_t)addr - PERIPH_BASE) * 32 + (bit) * 4;
-	};
-	
-//	template<typename var, uint32_t bit>
-//	class from_member
-//	{
-//	public:
-//		static const bool is_sram	= (uint32_t)(&var) >= SRAM_BASE && ((uint32_t)(&var) - SRAM_BASE) < 0x80000;
-//		static const bool is_periph	= (uint32_t)(&var) >= PERIPH_BASE && ((uint32_t)(&var) - PERIPH_BASE) < 0x80000;
-//	
-//		static const uint32_t to_bb	= PERIPH_BB_BASE + ((uint32_t)(&var) - PERIPH_BASE) * 32 + (bit) * 4;
-//	};
-} // namespace BB
+template<uint32_t addr, uint32_t bit>
+class from_address
+{
+public:
+	static const bool is_sram	= addr >= SRAM_BASE && (addr - SRAM_BASE) < 0x80000;
+	static const bool is_periph	= addr >= PERIPH_BASE && (addr - PERIPH_BASE) < 0x80000;
+
+	STATIC_ASSERT(is_sram || is_periph, "The address cannot be matched to BIT BANDING range");
+	STATIC_ASSERT(bit < 32, "Invalid bit offset");
+
+	static const uint32_t to_bb	= is_sram ? SRAM_BB_BASE + (addr - SRAM_BASE) * 32 + (bit) * 4 :
+											PERIPH_BB_BASE + (addr - PERIPH_BASE) * 32 + (bit) * 4;
+};
+
+#define FROM_ADDRESS_BIT_POS_TO_BB(member_ptr, bit)		::mcu::registers::from_address<(uint32_t)(member_ptr), bit>::to_bb
+//#define FROM_ADDRESS_BIT_MASK_TO_BB(member_ptr, bit)		::mcu::registers::from_address<(uint32_t)(member_ptr), POSITION_VAL(bit)>::to_bb
+
+#define WRITE_BB_REG(address, value)			(*(__IO uint32_t *)(address) = value)
+#define READ_BB_REG(address)					(*(__IO uint32_t *)(address))
+
+#define SET_BB_REG(address)						WRITE_BB_REG(address, !RESET)
+#define RESET_BB_REG(address)					WRITE_BB_REG(address, RESET)
+
+#define IS_BB_REG_SET(address)					(READ_BB_REG(address) != RESET)
+#define IS_BB_REG_RESET(address)				(READ_BB_REG(address) == RESET)
 
 } // namespace registers
 } // namespace mcu

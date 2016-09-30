@@ -402,24 +402,80 @@ namespace config {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::mode		Mode      = config::analog,
-		config::speed		Speed     = config::speed_freq_low,
-		state::state		DefState  = state::reset,
-		config::pull_mode	Pull      = config::pull_no,
-		config::flag		Flag      = config::flag_no
+		config::mode		Mode      ,
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
 		>
-	class check_params
+	class check_params;
+
+	template <
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
+		>
+	class check_params<analog, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(FAIL_IF(Mode == analog && Pull != config::pull_no), "The ANALOG configuration of PIN, must not be configured in PULL UP/DOWN mode");
-		STATIC_ASSERT(FAIL_IF(Mode == analog && (Flag != config::flag_no && (Flag & flags_mode_mask) != flags_analog)), "Wrong flag for the ANALOG configuration of PIN");
+		STATIC_ASSERT(Pull == config::pull_no, "The ANALOG configuration of PIN, must not be configured in PULL UP/DOWN mode");
+		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_analog, "Wrong flag for the ANALOG configuration of PIN");
 
-		STATIC_ASSERT(FAIL_IF(Mode == input  && (Flag != config::flag_no && (Flag & flags_mode_mask) != flags_input )), "Wrong flag for the INPUT configuration of PIN");
-
-		STATIC_ASSERT(FAIL_IF(Mode == output && (Flag != config::flag_no && (Flag & flags_mode_mask) != flags_output)), "Wrong flag for the OUTPUT configuration of PIN");
-
-		STATIC_ASSERT(FAIL_IF(Mode == alt_input  && (Flag != config::flag_no && (Flag & flags_mode_mask) != flags_alt_input )), "Wrong flag for the ALTERNATIVE INPUT configuration of PIN");
-
-		STATIC_ASSERT(FAIL_IF(Mode == alt_output && (Flag != config::flag_no && (Flag & flags_mode_mask) != flags_alt_output)), "Wrong flag for the ALTERNATIVE OUTPUT configuration of PIN");
+	public:
+		static const bool verified = true;
+	};
+	
+	template <
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
+		>
+	class check_params<input, Speed, DefState, Pull, Flag>
+	{
+		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_input, "Wrong flag for the INPUT configuration of PIN");
+		
+	public:
+		static const bool verified = true;
+	};
+	
+	template <
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
+		>
+	class check_params<output, Speed, DefState, Pull, Flag>
+	{
+		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_output, "Wrong flag for the OUTPUT configuration of PIN");
+		
+	public:
+		static const bool verified = true;
+	};
+	
+	template <
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
+		>
+	class check_params<alt_input, Speed, DefState, Pull, Flag>
+	{
+		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_alt_input, "Wrong flag for the ALTERNATIVE INPUT configuration of PIN");
+		
+	public:
+		static const bool verified = true;
+	};
+	
+	template <
+		config::speed		Speed     ,
+		state::state		DefState  ,
+		config::pull_mode	Pull      ,
+		config::flag		Flag      
+		>
+	class check_params<alt_output, Speed, DefState, Pull, Flag>
+	{
+		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_alt_output, "Wrong flag for the ALTERNATIVE OUTPUT configuration of PIN");
 		
 	public:
 		static const bool verified = true;
