@@ -1,4 +1,4 @@
-About											{#about}
+About
 =====
 
 -TSPL- is Template based Standard Peripheral Libraries for C++ projects.
@@ -37,7 +37,8 @@ Pros architecture:
 Dependencies
 ============
 
-- uses CMSIS drivers
+- ARM CortexM:
+-- uses CMSIS drivers
 
 
 
