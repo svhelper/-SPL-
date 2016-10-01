@@ -36,6 +36,14 @@
 #	define HSI_CALIBRATION_DEFAULT	0x10UL
 #endif /*HSI_CALIBRATION_DEFAULT*/
 
+#ifndef NVIC_PRIORITYGROUP
+#	define  NVIC_PRIORITYGROUP		NVIC_PRIORITYGROUP_4
+#endif /*TICK_INT_PRIORITY*/
+
+#ifndef TICK_INT_PRIORITY
+#	define  TICK_INT_PRIORITY		0x00UL    /*!< tick interrupt priority (lowest by default)  */
+#endif /*TICK_INT_PRIORITY*/
+
 
 /************************************************************************/
 /*                                                                      */
@@ -90,6 +98,10 @@ namespace clock {
 			static const uint32_t APB1CLK	= 36000000UL;
 			static const uint32_t APB2CLK	= 72000000UL;
 			static const uint32_t ADCCLK	= 14000000UL;
+
+			static const uint32_t FLASHCLK_LATENCY_0_Hz	= 24000000UL;			// Zero wait state
+			static const uint32_t FLASHCLK_LATENCY_1_Hz	= 48000000UL;			// One wait state
+			static const uint32_t FLASHCLK_LATENCY_2_Hz	= 72000000UL;			// Two wait states
 		};
 
 		class min
@@ -139,20 +151,20 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 		
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 				
 				/* Adjusts the Internal High Speed oscillator (HSI) calibration value.*/
 				MODIFY_REG(RCC->CR, RCC_CR_HSITRIM, (uint32_t)_Calibration << RCC_CR_HSITRIM_Pos);
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				SET_BB_REG(_RCC_CR_HSION_BB);
@@ -161,7 +173,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_CR_HSIRDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				RESET_BB_REG(_RCC_CR_HSION_BB);
@@ -194,17 +206,17 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				SET_BB_REG(_RCC_CSR_LSION_BB);
@@ -216,7 +228,7 @@ namespace clock {
 				//HAL_Delay(1);
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				RESET_BB_REG(_RCC_CSR_LSION_BB);
@@ -250,17 +262,17 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 		
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				RESET_BB_REG(_RCC_CR_HSEON_BB);
@@ -272,7 +284,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_CR_HSERDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				RESET_BB_REG(_RCC_CR_HSEON_BB);
@@ -308,17 +320,17 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 		
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				RESET_BB_REG(_RCC_CR_HSEON_BB);
@@ -330,7 +342,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_CR_HSERDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				RESET_BB_REG(_RCC_CR_HSEON_BB);
@@ -369,17 +381,17 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 		
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				/* Enable Power Clock*/
@@ -401,7 +413,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_BDCR_LSERDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				/* Set the new LSE configuration */
@@ -441,17 +453,17 @@ namespace clock {
 			static const uint32_t						_usb_clock		= 0;
 			static const bool							_usb_active		= false;
 		
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				// enabling
 				/* Enable Power Clock*/
@@ -473,7 +485,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_BDCR_LSERDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				/* Set the new LSE configuration */
@@ -501,26 +513,26 @@ namespace clock {
 		
 		static const uint32_t	_Clock_Hz		= _cfg_::_Clock_Hz;
 
-		static void Init()
+		static void init()
 		{
-			_cfg_::Init();
+			_cfg_::init();
 		}
 		
-		static void Enable(::mcu::clock::state::state new_state)
+		static void enable(::mcu::clock::state::state new_state)
 		{
-			(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+			(new_state == ::mcu::clock::state::enable) ? start() : stop();
 		}
 			
-		static void Start()
+		static void start()
 		{
 			// enabling
-			_cfg_::Start();
+			_cfg_::start();
 		}
 		
-		static void Stop()
+		static void stop()
 		{
 			// disabling
-			_cfg_::Stop();
+			_cfg_::stop();
 		}
 	};
 
@@ -758,17 +770,17 @@ namespace clock {
 			STATIC_ASSERT(!pll_usb || _usb_active, "PLL cannot find clock frequency for USB");
 
 		public:
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Enable(::mcu::clock::state::state new_state)
+			static void enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Pos) == RCC_CFGR_SWS_PLL)
 				{
@@ -776,7 +788,7 @@ namespace clock {
 				}
 				
 				// enabling
-				osc::Start();
+				osc::start();
 
 				/* Disable the main PLL. */
 				RESET_BB_REG(_RCC_CR_PLLON_BB);
@@ -794,7 +806,7 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_CR_PLLRDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
 				/* Disable the main PLL. */
@@ -803,7 +815,7 @@ namespace clock {
 				/* Wait till PLL is disabled */
 				while(IS_BB_REG_SET(_RCC_CR_PLLRDY_BB)) {}
 				
-				osc::Stop();
+				osc::stop();
 			}
 		};
 
@@ -838,17 +850,17 @@ namespace clock {
 			STATIC_ASSERT(!pll_usb || _usb_active, "PLL cannot find clock frequency for USB");
 
 		public:
-			static void Init()
+			static void init()
 			{
-				(_State == ::mcu::clock::state::enable) ? Start() : Stop();
+				(_State == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
 			static void Enable(::mcu::clock::state::state new_state)
 			{
-				(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+				(new_state == ::mcu::clock::state::enable) ? start() : stop();
 			}
 			
-			static void Start()
+			static void start()
 			{
 				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Pos) == RCC_CFGR_SWS_PLL)
 				{
@@ -856,7 +868,7 @@ namespace clock {
 				}
 				
 				// enabling
-				osc::Start();
+				osc::start();
 
 				/* Disable the main PLL. */
 				RESET_BB_REG(_RCC_CR_PLLON_BB);
@@ -878,10 +890,10 @@ namespace clock {
 				while(IS_BB_REG_RESET(_RCC_CR_PLLRDY_BB)) {}
 			}
 			
-			static void Stop()
+			static void stop()
 			{
 				// disabling
-				osc::Stop();
+				osc::stop();
 			}
 		};
 
@@ -916,26 +928,26 @@ namespace clock {
 		typedef config::pll_cfg<OSC::_cfg_::_OscType, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, usb> _cfg_;
 	
 	public:
-		static void Init()
+		static void init()
 		{
-			_cfg_::Init();
+			_cfg_::init();
 		}
 
-		static void Enable(::mcu::clock::state::state new_state)
+		static void enable(::mcu::clock::state::state new_state)
 		{
-			(new_state == ::mcu::clock::state::enable) ? Start() : Stop();
+			(new_state == ::mcu::clock::state::enable) ? start() : stop();
 		}
 			
-		static void Start()
+		static void start()
 		{
 			// enabling
-			_cfg_::Start();
+			_cfg_::start();
 		}
 		
-		static void Stop()
+		static void stop()
 		{
 			// disabling
-			_cfg_::Stop();
+			_cfg_::stop();
 		}
 	};
 
@@ -995,6 +1007,7 @@ namespace clock {
 				(_Clock_Hz / 256 <= HCLK_Max_Hz) ? 256 :
 				(_Clock_Hz / 512 <= HCLK_Max_Hz) ? 512 :
 				0;
+			
 			STATIC_ASSERT(_ahb_div > 0, "The required clock frequency for HCLK cannot be reached");
 
 			static const uint32_t	_HCLK_Hz	= _Clock_Hz / _ahb_div;
@@ -1030,13 +1043,14 @@ namespace clock {
 			
 			//------------------------------------------------------------------------
 			static const uint32_t	_CortexSysTimer_div	=
-				(_HCLK_Hz / 0xFFFFFFFF / 1 <= CortexSysTimer_Max_Hz) ? 1 :
-				(_HCLK_Hz / 0xFFFFFFFF / 8 <= CortexSysTimer_Max_Hz) ? 8 :
+				(_HCLK_Hz / SysTick_LOAD_RELOAD_Msk / 1 <= CortexSysTimer_Max_Hz) ? 1 :
+				(_HCLK_Hz / SysTick_LOAD_RELOAD_Msk / 8 <= CortexSysTimer_Max_Hz) ? 8 :
 				0;
 
 			STATIC_ASSERT(_CortexSysTimer_div > 0, "The required clock frequency for CortexSysTimer cannot be reached");
 
 			static const uint32_t	_CortexSysTimer_load	= _HCLK_Hz / CortexSysTimer_Max_Hz / _CortexSysTimer_div;
+			STATIC_ASSERT((_CortexSysTimer_load-1) <= SysTick_LOAD_RELOAD_Msk, "The required clock frequency for CortexSysTimer cannot be reached (or Invalid parameter CortexSysTimer_Max_Hz)");
 			
 			static const uint32_t	_CortexSysTimer_Hz	= _HCLK_Hz / _CortexSysTimer_load / _CortexSysTimer_div;
 			STATIC_ASSERT(_CortexSysTimer_Hz >= limits::min::HCLK && _CortexSysTimer_Hz <= limits::max::HCLK, "The required clock frequency for CortexSysTimer cannot be reached (or Invalid parameter CortexSysTimer_Max_Hz)");
@@ -1055,9 +1069,163 @@ namespace clock {
 			STATIC_ASSERT(_ADC_Hz >= limits::min::ADCCLK && _ADC_Hz <= limits::max::ADCCLK, "The required clock frequency for ADC cannot be reached (or Invalid parameter ADCCLK_Max_Hz)");
 			
 			//------------------------------------------------------------------------
+#if defined(FLASH_ACR_LATENCY)
+			static const uint32_t	_flash_latency	=
+				(_HCLK_Hz <= limits::max::FLASHCLK_LATENCY_0_Hz) ? 0 :			// Zero wait state
+				(_HCLK_Hz <= limits::max::FLASHCLK_LATENCY_1_Hz) ? 1 :			// One wait state
+				(_HCLK_Hz <= limits::max::FLASHCLK_LATENCY_2_Hz) ? 2 :			// Two wait states
+				0xFFFFFFFF;
+
+			STATIC_ASSERT(_flash_latency <= 2, "internal error: Invalid Clock Source frequency");
+
+#else /* FLASH_ACR_LATENCY */
+			static const uint32_t	_flash_latency	= 0;
+			
+#endif /* FLASH_ACR_LATENCY */
+
+			//------------------------------------------------------------------------
+			static const uint32_t	_rcc_cfgr_hpre_div =
+				(_ahb_div ==   1) ? RCC_CFGR_HPRE_DIV1   :
+				(_ahb_div ==   2) ? RCC_CFGR_HPRE_DIV2   :
+				(_ahb_div ==   4) ? RCC_CFGR_HPRE_DIV4   :
+				(_ahb_div ==   8) ? RCC_CFGR_HPRE_DIV8   :
+				(_ahb_div ==  16) ? RCC_CFGR_HPRE_DIV16  :
+			//	(_ahb_div ==  32) ? RCC_CFGR_HPRE_DIV32  :
+				(_ahb_div ==  64) ? RCC_CFGR_HPRE_DIV64  :
+				(_ahb_div == 128) ? RCC_CFGR_HPRE_DIV128 :
+				(_ahb_div == 256) ? RCC_CFGR_HPRE_DIV256 :
+				(_ahb_div == 512) ? RCC_CFGR_HPRE_DIV512 :
+				0;
+
+			static const uint32_t _flash_acr_latency	= _flash_latency << FLASH_ACR_LATENCY_Pos;
+
+			static const uint32_t _rcc_cfgr_sw =
+				(_pll_mul > 1)													?	RCC_CFGR_SW_PLL :
+				(_OscType == ::mcu::clock::config::high_speed_internal)			?	RCC_CFGR_SW_HSI :
+				(_OscType == ::mcu::clock::config::high_speed_external)			?	RCC_CFGR_SW_HSE :
+				(_OscType == ::mcu::clock::config::high_speed_external_bypass)	?	RCC_CFGR_SW_HSE :
+																					RCC_CFGR_SW_HSI;
+			
+			static const uint32_t _rcc_cfgr_sws =
+				(_pll_mul > 1)													?	RCC_CFGR_SWS_PLL :
+				(_OscType == ::mcu::clock::config::high_speed_internal)			?	RCC_CFGR_SWS_HSI :
+				(_OscType == ::mcu::clock::config::high_speed_external)			?	RCC_CFGR_SWS_HSE :
+				(_OscType == ::mcu::clock::config::high_speed_external_bypass)	?	RCC_CFGR_SWS_HSE :
+																					RCC_CFGR_SWS_HSI;
+
+			static const uint32_t	_rcc_cfgr_ppre1	=
+				(_apb1_div ==  1) ?	RCC_CFGR_PPRE1_DIV1  :
+				(_apb1_div ==  2) ?	RCC_CFGR_PPRE1_DIV2  :
+				(_apb1_div ==  4) ?	RCC_CFGR_PPRE1_DIV4  :
+				(_apb1_div ==  8) ?	RCC_CFGR_PPRE1_DIV8  :
+				(_apb1_div == 16) ?	RCC_CFGR_PPRE1_DIV16 :
+									RCC_CFGR_PPRE1_DIV16;
+
+			static const uint32_t	_rcc_cfgr_ppre2 = 
+				(_apb2_div ==  1) ?	RCC_CFGR_PPRE2_DIV1  :
+				(_apb2_div ==  2) ?	RCC_CFGR_PPRE2_DIV2  :
+				(_apb2_div ==  4) ?	RCC_CFGR_PPRE2_DIV4  :
+				(_apb2_div ==  8) ?	RCC_CFGR_PPRE2_DIV8  :
+				(_apb2_div == 16) ?	RCC_CFGR_PPRE2_DIV16 :
+									RCC_CFGR_PPRE2_DIV16;
+
+			static const uint32_t	_rcc_cfgr_adcpre =
+				(_ADC_div == 2) ? RCC_CFGR_ADCPRE_DIV2 :
+				(_ADC_div == 4) ? RCC_CFGR_ADCPRE_DIV4 :
+				(_ADC_div == 6) ? RCC_CFGR_ADCPRE_DIV6 :
+				(_ADC_div == 8) ? RCC_CFGR_ADCPRE_DIV8 :
+				0;
+			
+			static const uint32_t _rcc_cfgr_usbpre = _usb_div_1_5 ? 0 : RCC_CFGR_USBPRE;
+
+			//------------------------------------------------------------------------
+			
+		public:
+			static void init()
+			{
+#if defined(FLASH_ACR_PRFTBE)
+				FLASH->ACR |= FLASH_ACR_PRFTBE;
+#endif /* FLASH_ACR_PRFTBE */
+				
+				// Set Interrupt Group Priority
+				NVIC_SetPriorityGrouping(NVIC_PRIORITYGROUP);
+
+#if defined(FLASH_ACR_LATENCY)
+				// Set maximal safe FLASH LATENCY during switching
+				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, 2);
+#endif /* FLASH_ACR_LATENCY */
+
+				// HCLK Configuration
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_HPRE, _rcc_cfgr_hpre_div);
+				
+				// SYSCLK Configuration
+				osc::init();														// Clock Source Initialization
+
+				// if(_pll_mul)
+				// {
+				// 	// PLL is selected as System Clock Source
+				// 	static const uint32_t _RCC_CR_PLLRDY_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_PLLRDY_Pos);
+				// 	
+				// 	if(IS_BB_REG_RESET(_RCC_CR_PLLRDY_BB))			// Check the PLL ready
+				// 		return;
+				// }
+				// else if(_OscType == ::mcu::clock::config::high_speed_internal)
+				// {
+				// 	// HSI is selected as System Clock Source
+				// 	static const uint32_t _RCC_CR_HSIRDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSIRDY_Pos);
+				// 	
+				// 	if(IS_BB_REG_RESET(_RCC_CR_HSIRDY_BB))			// Check the HSI ready
+				// 		return;
+				// }
+				// else if(_OscType == ::mcu::clock::config::high_speed_external || _OscType == ::mcu::clock::config::high_speed_external_bypass)
+				// {
+				// 	// HSE is selected as System Clock Source
+				// 	static const uint32_t _RCC_CR_HSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSERDY_Pos);
+				// 	
+				// 	if(IS_BB_REG_RESET(_RCC_CR_HSERDY_BB))			// Check the HSE ready
+				// 		return;			// FAILED
+				// }
+				// else
+				// {
+				// 	STATIC_ASSERT(false, "internal error: Invalid Clock Source type");
+				// }
+
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, _rcc_cfgr_sw);					// Switching to Clock Source
+				
+				while(READ_BIT(RCC->CFGR, RCC_CFGR_SWS) != _rcc_cfgr_sws) {}		// Waiting for finalization
+
+#if defined(FLASH_ACR_LATENCY)
+				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, _flash_acr_latency);		// Initialization FLASH LATENCY
+#endif /* FLASH_ACR_LATENCY */
+
+				// PCLK1 Configuration
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE1, _rcc_cfgr_ppre1);
+
+				// PCLK2 Configuration
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE2, _rcc_cfgr_ppre2);
+
+				// Configure the SysTick to have interrupt in 1ms time basis
+				SysTick_Config(_CortexSysTimer_load);
+				(_CortexSysTimer_div == 1) ?	(void)(SysTick->CTRL |= SYSTICK_CLKSOURCE_HCLK) :
+				(_CortexSysTimer_div == 8) ?	(void)(SysTick->CTRL &= ~SYSTICK_CLKSOURCE_HCLK) :
+												(void)0;
+
+				// Configure the SysTick IRQ priority
+				//NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_PRIORITYGROUP /*NVIC_GetPriorityGrouping()*/, TICK_INT_PRIORITY, 0));
+
+				// Configure the ADC clock source
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_ADCPRE, _rcc_cfgr_adcpre);
+
+				// Configure the USB clock source
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_USBPRE, _rcc_cfgr_usbpre);
+			}
 		};
 		
 	public:
+		static void init()
+		{
+			_cfg_::init();
+		}
 	};
 	
 //////////////////////////////////////////////////////////////////////////
@@ -1118,6 +1286,25 @@ class pll_usb_min : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz
 template< class OSC, uint32_t ClockMin_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, uint32_t ClockMax_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
 class pll_usb_max : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz, ClockMax_Hz, true, true, state > {};
 
+
+//////////////////////////////////////////////////////////////////////////	
+
+typedef ::mcu::stm32::clock::sysclock_auto<osc_hsi_def       > sysclock_osc_hsi_def;
+typedef ::mcu::stm32::clock::sysclock_auto<osc_hse_def       > sysclock_osc_hse_def;
+typedef ::mcu::stm32::clock::sysclock_auto<pll_hsi_def       > sysclock_pll_hsi_def;
+typedef ::mcu::stm32::clock::sysclock_auto<pll_hse_def       > sysclock_pll_hse_def;
+typedef ::mcu::stm32::clock::sysclock_auto<pll_hse_bypass_def> sysclock_pll_hse_bypass_def;
+
+//------------------------------------------------------------------------
+template<
+		class		ClockSource																,
+		uint32_t	CortexSysTimer_ms			= 1000										,
+		uint32_t	HCLK_Max_Hz					= ::mcu::stm32::clock::limits::max::HCLK	,
+		uint32_t	APB1CLK_Max_Hz				= ::mcu::stm32::clock::limits::max::APB1CLK	,
+		uint32_t	APB2CLK_Max_Hz				= ::mcu::stm32::clock::limits::max::APB2CLK	,
+		uint32_t	ADCCLK_Max_Hz				= ::mcu::stm32::clock::limits::max::ADCCLK	
+	>
+class sysclock_auto : public ::mcu::stm32::clock::sysclock_auto< ClockSource, HCLK_Max_Hz, APB1CLK_Max_Hz, APB2CLK_Max_Hz, 1000000/*Hz*/ / CortexSysTimer_ms, ADCCLK_Max_Hz > {};
 
 } // namespace clock
 
