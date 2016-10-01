@@ -323,11 +323,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
+		config::mode	Mode      ,
 		port::pins		PinID
 		> class REG_RCC
 	{
 	public:
-		static const uint32_t APB2ENR_MASK = 
+		static const uint32_t APB2ENR_AFIOEN = (Mode == config::alt_input || Mode == config::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
+		
+		static const uint32_t APB2ENR_MASK = APB2ENR_AFIOEN | (
 			IF_GPIOA_EXISTS((PinID >= port::PA0 && PinID <= port::PA31) ? RCC_APB2ENR_IOPAEN :)
 			IF_GPIOB_EXISTS((PinID >= port::PB0 && PinID <= port::PB31) ? RCC_APB2ENR_IOPBEN :)
 			IF_GPIOC_EXISTS((PinID >= port::PC0 && PinID <= port::PC31) ? RCC_APB2ENR_IOPCEN :)
@@ -337,7 +340,7 @@ namespace registers {
 			IF_GPIOG_EXISTS((PinID >= port::PG0 && PinID <= port::PG31) ? RCC_APB2ENR_IOPGEN :)
 			IF_GPIOH_EXISTS((PinID >= port::PH0 && PinID <= port::PH31) ? RCC_APB2ENR_IOPHEN :)
 			IF_GPIOI_EXISTS((PinID >= port::PI0 && PinID <= port::PI31) ? RCC_APB2ENR_IOPIEN :)
-			0;
+			0);
 		static const uint32_t APB2ENR = APB2ENR_MASK;
 	};
 
@@ -355,12 +358,12 @@ template <	port::pins			PinID     ,
 			config::pull_mode	Pull      ,
 			config::flag		Flag      
 		>
-class gpio_t
+class gpio_base
 {
 private:
 	class _const_
 	{
-		friend class gpio_t;
+		friend class gpio_base;
 		
 		static const stm32::port::address PORT   = stm32::port::convert<PinID>::to_address;
 		static const stm32::port::pin     PIN    = stm32::port::convert<PinID>::to_pin;
@@ -374,8 +377,8 @@ private:
 	};
 	
 protected:
-	gpio_t();
-	~gpio_t();
+	gpio_base();
+	~gpio_base();
 
 public:
 	class _cfg_
@@ -397,7 +400,7 @@ public:
 		static const bool verified = config::check_params<_Mode, _Speed, _DefPinState, _Pull, _Flag>::verified;
 
 		typedef stm32::registers::REG_GPIO<_Mode, _Speed, _DefPinState, _Pull, _Flag, _Port, _Pin> REG_GPIO;
-		typedef stm32::registers::REG_RCC<_PinID> REG_RCC;
+		typedef stm32::registers::REG_RCC<_Mode, _PinID> REG_RCC;
 	
 	public:
 		static const uint32_t _cr = REG_GPIO::CR;
@@ -418,7 +421,7 @@ public:
 		if(_cfg_::_rcc_apb2enr_mask)
 		{
 			SET_BIT (RCC->APB2ENR, _cfg_::_rcc_apb2enr);
-			READ_BIT(RCC->APB2ENR, _cfg_::_rcc_apb2enr);		/* Delay after an RCC peripheral clock enabling */
+			__NOP();
 		}
 		
 		update();
@@ -531,6 +534,16 @@ public:
 		// accessible at any time
 		return IS_BB_REG_SET(_const_::IDR_BB);
 	}
+	
+	template <state::state NewState>
+	class _write_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, NewState    , _cfg_::_Pull, _cfg_::_Flag>
+	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
+	
+	class _set_   : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::set  , _cfg_::_Pull, _cfg_::_Flag>
+	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
+	
+	class _reset_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::reset, _cfg_::_Pull, _cfg_::_Flag>
+	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
 };
 
 /************************************************************************/
@@ -538,7 +551,7 @@ public:
 /************************************************************************/
 template <	port::pins			PinID
 		>
-class analog : public gpio_t<PinID, config::analog, config::speed_freq_low, state::reset, config::pull_no, config::flag_no> { };
+class analog : public gpio_base<PinID, config::analog, config::speed_freq_low, state::reset, config::pull_no, config::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -546,7 +559,7 @@ class analog : public gpio_t<PinID, config::analog, config::speed_freq_low, stat
 template <	port::pins			PinID,
 			config::pull_mode	Pull      = config::pull_no
 		>
-class input : public gpio_t<PinID, config::input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
+class input : public gpio_base<PinID, config::input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -556,7 +569,7 @@ template <	port::pins			PinID,
 			config::speed		Speed     = config::speed_freq_low,
 			bool				OpenDrain = false
 		>
-class output : public gpio_t<PinID, config::output, Speed, DefState, config::pull_no, OpenDrain ? config::output_open_drain : config::output_push_pull> { };
+class output : public gpio_base<PinID, config::output, Speed, DefState, config::pull_no, OpenDrain ? config::output_open_drain : config::output_push_pull> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -564,7 +577,7 @@ class output : public gpio_t<PinID, config::output, Speed, DefState, config::pul
 template <	port::pins			PinID,
 			config::pull_mode	Pull      = config::pull_no
 		>
-class alt_input : public gpio_t<PinID, config::alt_input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
+class alt_input : public gpio_base<PinID, config::alt_input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -573,7 +586,7 @@ template <	port::pins			PinID,
 			config::speed		Speed     = config::speed_freq_low,
 			bool				OpenDrain = false
 		>
-class alt_output : public gpio_t<PinID, config::alt_output, Speed, state::reset, config::pull_no, OpenDrain ? config::alt_output_open_drain : config::alt_output_push_pull> { };
+class alt_output : public gpio_base<PinID, config::alt_output, Speed, state::reset, config::pull_no, OpenDrain ? config::alt_output_open_drain : config::alt_output_push_pull> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -587,7 +600,7 @@ namespace outputs {
 	private:
 		class _const_
 		{
-			friend class gpio_t;
+			friend class gpio_base;
 			
 			static const stm32::port::address PORT   = Port::_cfg_::_Port;
 			static const stm32::port::pin     PIN    = Port::_cfg_::_Pin;
@@ -617,7 +630,7 @@ namespace outputs {
 			static const bool verified = config::check_params<_Mode, _Speed, _DefPinState, _Pull, _Flag>::verified;
 
 			typedef stm32::registers::REG_GPIO<_Mode, _Speed, _DefPinState, _Pull, _Flag, _Port, _Pin> REG_GPIO;
-			typedef stm32::registers::REG_RCC<_PinID> REG_RCC;
+			typedef stm32::registers::REG_RCC<_Mode, _PinID> REG_RCC;
 		
 		public:
 			static const uint32_t _cr = REG_GPIO::CR;
@@ -729,7 +742,7 @@ public:
 		if(apb2enr_mask)
 		{
 			SET_BIT(RCC->APB2ENR, apb2enr);
-			READ_BIT(RCC->APB2ENR, apb2enr);	/* Delay after an RCC peripheral clock enabling */
+			__NOP();
 		}
 		
 #define __INIT_PORT(PORT)		\
