@@ -493,7 +493,7 @@ template <	port::pins			Pin       = port::invalid_port,
 			config::pull_mode	Pull      = config::pull_no,
 			config::flag		Flag      = config::flag_no
 		>
-class gpio_t;
+class gpio_base;
 
 /************************************************************************/
 /*                                                                      */
