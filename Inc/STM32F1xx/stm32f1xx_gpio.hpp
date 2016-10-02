@@ -122,34 +122,34 @@ namespace port {
 		pin_15,
 	} pin;
 	
-	using namespace ::mcu::gpio::port;
+	using namespace ::mcu::gpio;
 	
-	template<pins PinID>
+	template<pin_id::pin_id PinID>
 	class convert
 	{
 	public:
 		static const address to_address =
-			IF_GPIOA_EXISTS((PinID >= PA0 && PinID <= PA15) ? A :)
-			IF_GPIOB_EXISTS((PinID >= PB0 && PinID <= PB15) ? B :)
-			IF_GPIOC_EXISTS((PinID >= PC0 && PinID <= PC15) ? C :)
-			IF_GPIOD_EXISTS((PinID >= PD0 && PinID <= PD15) ? D :)
-			IF_GPIOE_EXISTS((PinID >= PE0 && PinID <= PE15) ? E :)
-			IF_GPIOF_EXISTS((PinID >= PF0 && PinID <= PF15) ? F :)
-			IF_GPIOG_EXISTS((PinID >= PG0 && PinID <= PG15) ? G :)
-			IF_GPIOH_EXISTS((PinID >= PH0 && PinID <= PH15) ? H :)
-			IF_GPIOI_EXISTS((PinID >= PI0 && PinID <= PI15) ? I :)
+			IF_GPIOA_EXISTS((PinID >= pin_id::PA0 && PinID <= pin_id::PA15) ? A :)
+			IF_GPIOB_EXISTS((PinID >= pin_id::PB0 && PinID <= pin_id::PB15) ? B :)
+			IF_GPIOC_EXISTS((PinID >= pin_id::PC0 && PinID <= pin_id::PC15) ? C :)
+			IF_GPIOD_EXISTS((PinID >= pin_id::PD0 && PinID <= pin_id::PD15) ? D :)
+			IF_GPIOE_EXISTS((PinID >= pin_id::PE0 && PinID <= pin_id::PE15) ? E :)
+			IF_GPIOF_EXISTS((PinID >= pin_id::PF0 && PinID <= pin_id::PF15) ? F :)
+			IF_GPIOG_EXISTS((PinID >= pin_id::PG0 && PinID <= pin_id::PG15) ? G :)
+			IF_GPIOH_EXISTS((PinID >= pin_id::PH0 && PinID <= pin_id::PH15) ? H :)
+			IF_GPIOI_EXISTS((PinID >= pin_id::PI0 && PinID <= pin_id::PI15) ? I :)
 			inv_address;
 
 		static const pin to_pin =
-			IF_GPIOA_EXISTS((PinID >= PA0 && PinID <= PA15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOB_EXISTS((PinID >= PB0 && PinID <= PB15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOC_EXISTS((PinID >= PC0 && PinID <= PC15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOD_EXISTS((PinID >= PD0 && PinID <= PD15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOE_EXISTS((PinID >= PE0 && PinID <= PE15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOF_EXISTS((PinID >= PF0 && PinID <= PF15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOG_EXISTS((PinID >= PG0 && PinID <= PG15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOH_EXISTS((PinID >= PH0 && PinID <= PH15) ? static_cast<pin>(PinID % 32) :)
-			IF_GPIOI_EXISTS((PinID >= PI0 && PinID <= PI15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOA_EXISTS((PinID >= pin_id::PA0 && PinID <= pin_id::PA15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOB_EXISTS((PinID >= pin_id::PB0 && PinID <= pin_id::PB15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOC_EXISTS((PinID >= pin_id::PC0 && PinID <= pin_id::PC15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOD_EXISTS((PinID >= pin_id::PD0 && PinID <= pin_id::PD15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOE_EXISTS((PinID >= pin_id::PE0 && PinID <= pin_id::PE15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOF_EXISTS((PinID >= pin_id::PF0 && PinID <= pin_id::PF15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOG_EXISTS((PinID >= pin_id::PG0 && PinID <= pin_id::PG15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOH_EXISTS((PinID >= pin_id::PH0 && PinID <= pin_id::PH15) ? static_cast<pin>(PinID % 32) :)
+			IF_GPIOI_EXISTS((PinID >= pin_id::PI0 && PinID <= pin_id::PI15) ? static_cast<pin>(PinID % 32) :)
 			inv_pin;
 	};
 } // namespace port
@@ -180,11 +180,11 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::mode		Mode      ,
-		config::speed		Speed     ,
+		mode::mode			Mode      ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
@@ -192,14 +192,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::speed		Speed     ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
-	class REG_GPIO<config::analog, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<mode::analog, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 		/* If we are configuring the pin in INPUT analog mode */
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -215,48 +215,48 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::speed		Speed     ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
-	class REG_GPIO<config::input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<mode::input, Speed, DefState, Pull, Flag, Port, Pin>
 	{
-		static const uint32_t pull_up_dn = ((Pull == config::pull_up) || (Pull == config::pull_down)) ? 0x01UL : 0x00UL;
+		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
 		static const uint32_t CNF  = pull_up_dn ? _const_::GPIO_CR_CNF_INPUT_PU_PD : _const_::GPIO_CR_CNF_INPUT_FLOATING;
 
 	public:
 		static const uint32_t CR = MODE | CNF;
 		static const uint32_t ODR_MASK  = (pull_up_dn << Pin);
-		static const uint32_t ODR       = (Pull == config::pull_up) ? (0x01UL << Pin) : (0x00UL << Pin);
+		static const uint32_t ODR       = (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
 		static const uint32_t ODR_SET   = ODR;
 		static const uint32_t ODR_RESET = ODR;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::speed		Speed     ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
-	class REG_GPIO<config::output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<mode::output, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 	private:
 		static const uint32_t MODE =
-			(Speed == config::speed_freq_low   ) ? _const_::GPIO_CR_MODE_OUTPUT_02MHZ :
-			(Speed == config::speed_freq_medium) ? _const_::GPIO_CR_MODE_OUTPUT_10MHZ :
-			(Speed == config::speed_freq_high  ) ? _const_::GPIO_CR_MODE_OUTPUT_50MHZ :
-			                                       _const_::GPIO_CR_MODE_OUTPUT_02MHZ;
+			(Speed == speed::low   ) ? _const_::GPIO_CR_MODE_OUTPUT_02MHZ :
+			(Speed == speed::medium) ? _const_::GPIO_CR_MODE_OUTPUT_10MHZ :
+			(Speed == speed::high  ) ? _const_::GPIO_CR_MODE_OUTPUT_50MHZ :
+			                           _const_::GPIO_CR_MODE_OUTPUT_02MHZ;
 		
 		static const uint32_t CNF = 
-			(Flag == config::output_push_pull ) ? _const_::GPIO_CR_CNF_GP_OUTPUT_PP : /* If we are configuring the pin in OUTPUT push-pull mode */
-			(Flag == config::output_open_drain) ? _const_::GPIO_CR_CNF_GP_OUTPUT_OD : /* If we are configuring the pin in OUTPUT open-drain mode */
+			(Flag == flag::output_push_pull ) ? _const_::GPIO_CR_CNF_GP_OUTPUT_PP : /* If we are configuring the pin in OUTPUT push-pull mode */
+			(Flag == flag::output_open_drain) ? _const_::GPIO_CR_CNF_GP_OUTPUT_OD : /* If we are configuring the pin in OUTPUT open-drain mode */
 												  _const_::GPIO_CR_CNF_GP_OUTPUT_PP;
 
 	public:
@@ -269,49 +269,49 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::speed		Speed     ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
-	class REG_GPIO<config::alt_input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<mode::alt_input, Speed, DefState, Pull, Flag, Port, Pin>
 	{
-		static const uint32_t pull_up_dn = ((Pull == config::pull_up) || (Pull == config::pull_down)) ? 0x01UL : 0x00UL;
+		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
 		static const uint32_t CNF  = pull_up_dn ? _const_::GPIO_CR_CNF_INPUT_PU_PD : _const_::GPIO_CR_CNF_INPUT_FLOATING;
 
 	public:
 		static const uint32_t CR = MODE | CNF;
 		static const uint32_t ODR_MASK  = (pull_up_dn << Pin);
-		static const uint32_t ODR       = (Pull == config::pull_up) ? (0x01UL << Pin) : (0x00UL << Pin);
+		static const uint32_t ODR       = (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
 		static const uint32_t ODR_SET   = ODR;
 		static const uint32_t ODR_RESET = ODR;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::speed		Speed     ,
+		speed::speed		Speed     ,
 		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      ,
+		pull::pull			Pull      ,
+		flag::flag			Flag      ,
 		port::address		Port      ,
 		port::pin			Pin       
 		>
-	class REG_GPIO<config::alt_output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<mode::alt_output, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 	private:
 		static const uint32_t MODE =
-			(Speed == config::speed_freq_low   ) ? _const_::GPIO_CR_MODE_OUTPUT_02MHZ :
-			(Speed == config::speed_freq_medium) ? _const_::GPIO_CR_MODE_OUTPUT_10MHZ :
-			(Speed == config::speed_freq_high  ) ? _const_::GPIO_CR_MODE_OUTPUT_50MHZ :
-			                                       _const_::GPIO_CR_MODE_OUTPUT_02MHZ;
+			(Speed == speed::low   ) ? _const_::GPIO_CR_MODE_OUTPUT_02MHZ :
+			(Speed == speed::medium) ? _const_::GPIO_CR_MODE_OUTPUT_10MHZ :
+			(Speed == speed::high  ) ? _const_::GPIO_CR_MODE_OUTPUT_50MHZ :
+			                           _const_::GPIO_CR_MODE_OUTPUT_02MHZ;
 		
 		static const uint32_t CNF = 
-			(Flag == config::output_push_pull ) ? _const_::GPIO_CR_CNF_AF_OUTPUT_PP : /* If we are configuring the pin in OUTPUT push-pull mode */
-			(Flag == config::output_open_drain) ? _const_::GPIO_CR_CNF_AF_OUTPUT_OD : /* If we are configuring the pin in OUTPUT open-drain mode */
-												  _const_::GPIO_CR_CNF_AF_OUTPUT_PP;
+			(Flag == flag::output_push_pull ) ? _const_::GPIO_CR_CNF_AF_OUTPUT_PP : /* If we are configuring the pin in OUTPUT push-pull mode */
+			(Flag == flag::output_open_drain) ? _const_::GPIO_CR_CNF_AF_OUTPUT_OD : /* If we are configuring the pin in OUTPUT open-drain mode */
+												_const_::GPIO_CR_CNF_AF_OUTPUT_PP;
 
 	public:
 		static const uint32_t CR = MODE | CNF;
@@ -323,23 +323,23 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::mode	Mode      ,
-		port::pins		PinID
+		mode::mode	Mode      ,
+		pin_id::pin_id	PinID
 		> class REG_RCC
 	{
 	public:
-		static const uint32_t APB2ENR_AFIOEN = (Mode == config::alt_input || Mode == config::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
+		static const uint32_t APB2ENR_AFIOEN = (Mode == mode::alt_input || Mode == mode::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
 		
 		static const uint32_t APB2ENR_MASK = APB2ENR_AFIOEN | (
-			IF_GPIOA_EXISTS((PinID >= port::PA0 && PinID <= port::PA31) ? RCC_APB2ENR_IOPAEN :)
-			IF_GPIOB_EXISTS((PinID >= port::PB0 && PinID <= port::PB31) ? RCC_APB2ENR_IOPBEN :)
-			IF_GPIOC_EXISTS((PinID >= port::PC0 && PinID <= port::PC31) ? RCC_APB2ENR_IOPCEN :)
-			IF_GPIOD_EXISTS((PinID >= port::PD0 && PinID <= port::PD31) ? RCC_APB2ENR_IOPDEN :)
-			IF_GPIOE_EXISTS((PinID >= port::PE0 && PinID <= port::PE31) ? RCC_APB2ENR_IOPEEN :)
-			IF_GPIOF_EXISTS((PinID >= port::PF0 && PinID <= port::PF31) ? RCC_APB2ENR_IOPFEN :)
-			IF_GPIOG_EXISTS((PinID >= port::PG0 && PinID <= port::PG31) ? RCC_APB2ENR_IOPGEN :)
-			IF_GPIOH_EXISTS((PinID >= port::PH0 && PinID <= port::PH31) ? RCC_APB2ENR_IOPHEN :)
-			IF_GPIOI_EXISTS((PinID >= port::PI0 && PinID <= port::PI31) ? RCC_APB2ENR_IOPIEN :)
+			IF_GPIOA_EXISTS((PinID >= pin_id::PA0 && PinID <= pin_id::PA31) ? RCC_APB2ENR_IOPAEN :)
+			IF_GPIOB_EXISTS((PinID >= pin_id::PB0 && PinID <= pin_id::PB31) ? RCC_APB2ENR_IOPBEN :)
+			IF_GPIOC_EXISTS((PinID >= pin_id::PC0 && PinID <= pin_id::PC31) ? RCC_APB2ENR_IOPCEN :)
+			IF_GPIOD_EXISTS((PinID >= pin_id::PD0 && PinID <= pin_id::PD31) ? RCC_APB2ENR_IOPDEN :)
+			IF_GPIOE_EXISTS((PinID >= pin_id::PE0 && PinID <= pin_id::PE31) ? RCC_APB2ENR_IOPEEN :)
+			IF_GPIOF_EXISTS((PinID >= pin_id::PF0 && PinID <= pin_id::PF31) ? RCC_APB2ENR_IOPFEN :)
+			IF_GPIOG_EXISTS((PinID >= pin_id::PG0 && PinID <= pin_id::PG31) ? RCC_APB2ENR_IOPGEN :)
+			IF_GPIOH_EXISTS((PinID >= pin_id::PH0 && PinID <= pin_id::PH31) ? RCC_APB2ENR_IOPHEN :)
+			IF_GPIOI_EXISTS((PinID >= pin_id::PI0 && PinID <= pin_id::PI31) ? RCC_APB2ENR_IOPIEN :)
 			0);
 		static const uint32_t APB2ENR = APB2ENR_MASK;
 	};
@@ -351,12 +351,12 @@ namespace registers {
 /*                                                                      */
 /************************************************************************/
 namespace gpio {
-template <	port::pins			PinID     ,
-			config::mode		Mode      ,
-			config::speed		Speed     ,
+template <	pin_id::pin_id		PinID     ,
+			mode::mode			Mode      ,
+			speed::speed		Speed     ,
 			state::state		DefState  ,
-			config::pull_mode	Pull      ,
-			config::flag		Flag      
+			pull::pull			Pull      ,
+			flag::flag			Flag      
 		>
 class gpio_base
 {
@@ -384,18 +384,18 @@ public:
 	class _cfg_
 	{
 	public:
-		static const port::pins				_PinID			= PinID;
+		static const pin_id::pin_id			_PinID			= PinID;
 		static const stm32::port::address	_Port			= _const_::PORT;
 		static const stm32::port::pin		_Pin			= _const_::PIN;
-		static const config::mode			_Mode			= Mode;
-		static const config::speed			_Speed			= Speed;
+		static const mode::mode				_Mode			= Mode;
+		static const speed::speed			_Speed			= Speed;
 		static const state::state			_DefPinState	= DefState;
-		static const config::pull_mode		_Pull			= Pull;
-		static const config::flag			_Flag			= Flag;
+		static const pull::pull				_Pull			= Pull;
+		static const flag::flag				_Flag			= Flag;
 
 	private:
-		STATIC_ASSERT(FAIL_IF(_PinID != port::invalid_port && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
-		STATIC_ASSERT(FAIL_IF(_PinID != port::invalid_port && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
+		STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
+		STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
 
 		static const bool verified = config::check_params<_Mode, _Speed, _DefPinState, _Pull, _Flag>::verified;
 
@@ -428,7 +428,7 @@ public:
 
 		/*--------------------- EXTI Mode Configuration ------------------------*/
 		/* Configure the External Interrupt or event for the current IO */
-//		if(_cfg_::_Mode == config::input && (_cfg_::_Flag & config::flags_input) != 0)
+//		if(_cfg_::_Mode == mode::input && (_cfg_::_Flag & flag::flags_input) != 0)
 //		{
 //			uint32_t temp;
 //			
@@ -510,23 +510,23 @@ public:
 	}
 	static bool get_out()
 	{
-		STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode");
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
 		return IS_BB_REG_SET(_const_::ODR_BB);
 	}
 	static void set()
 	{
-		STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode");
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
 		SET_BB_REG(_const_::ODR_BB);
 	}
 	static void reset()
 	{
-		STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode");
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
 		RESET_BB_REG(_const_::ODR_BB);
 	}
 
 	static void write(bool val)
 	{
-		STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode");
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
 		WRITE_BB_REG(_const_::ODR_BB, val);
 	}
 	static bool read()
@@ -537,56 +537,56 @@ public:
 	
 	template <state::state NewState>
 	class _write_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, NewState    , _cfg_::_Pull, _cfg_::_Flag>
-	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
+	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 	
 	class _set_   : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::set  , _cfg_::_Pull, _cfg_::_Flag>
-	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
+	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 	
 	class _reset_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::reset, _cfg_::_Pull, _cfg_::_Flag>
-	{ STATIC_ASSERT(_cfg_::_Mode == config::output, "Accessible in OUTPUT mode"); };
+	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	port::pins			PinID
+template <	pin_id::pin_id		PinID
 		>
-class analog : public gpio_base<PinID, config::analog, config::speed_freq_low, state::reset, config::pull_no, config::flag_no> { };
+class analog : public gpio_base<PinID, mode::analog, speed::low, state::reset, pull::no, flag::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	port::pins			PinID,
-			config::pull_mode	Pull      = config::pull_no
+template <	pin_id::pin_id		PinID,
+			pull::pull			Pull      = pull::no
 		>
-class input : public gpio_base<PinID, config::input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
+class input : public gpio_base<PinID, mode::input, speed::low, state::reset, Pull, flag::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	port::pins			PinID,
+template <	pin_id::pin_id		PinID,
 			state::state		DefState  = state::reset,
-			config::speed		Speed     = config::speed_freq_low,
+			speed::speed		Speed     = speed::low,
 			bool				OpenDrain = false
 		>
-class output : public gpio_base<PinID, config::output, Speed, DefState, config::pull_no, OpenDrain ? config::output_open_drain : config::output_push_pull> { };
+class output : public gpio_base<PinID, mode::output, Speed, DefState, pull::no, OpenDrain ? flag::output_open_drain : flag::output_push_pull> { };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	port::pins			PinID,
-			config::pull_mode	Pull      = config::pull_no
+template <	pin_id::pin_id		PinID,
+			pull::pull			Pull      = pull::no
 		>
-class alt_input : public gpio_base<PinID, config::alt_input, config::speed_freq_low, state::reset, Pull, config::flag_no> { };
+class alt_input : public gpio_base<PinID, mode::alt_input, speed::low, state::reset, Pull, flag::flag_no> { };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	port::pins			PinID,
-			config::speed		Speed     = config::speed_freq_low,
+template <	pin_id::pin_id		PinID,
+			speed::speed		Speed     = speed::low,
 			bool				OpenDrain = false
 		>
-class alt_output : public gpio_base<PinID, config::alt_output, Speed, state::reset, config::pull_no, OpenDrain ? config::alt_output_open_drain : config::alt_output_push_pull> { };
+class alt_output : public gpio_base<PinID, mode::alt_output, Speed, state::reset, pull::no, OpenDrain ? flag::alt_output_open_drain : flag::alt_output_push_pull> { };
 
 /************************************************************************/
 /*                                                                      */
@@ -614,18 +614,18 @@ namespace outputs {
 		class _cfg_
 		{
 		public:
-			static const port::pins				_PinID			= Port::_cfg_::_PinID;
+			static const pin_id::pin_id			_PinID			= Port::_cfg_::_PinID;
 			static const stm32::port::address	_Port			= Port::_cfg_::_Port;
 			static const stm32::port::pin		_Pin			= Port::_cfg_::_Pin;
-			static const config::mode			_Mode			= Port::_cfg_::_Mode;
-			static const config::speed			_Speed			= Port::_cfg_::_Speed;
+			static const mode::mode			_Mode			= Port::_cfg_::_Mode;
+			static const speed::speed			_Speed			= Port::_cfg_::_Speed;
 			static const state::state			_DefPinState	= State;
-			static const config::pull_mode		_Pull			= Port::_cfg_::_Pull;
-			static const config::flag			_Flag			= Port::_cfg_::_Flag;
+			static const pull::pull				_Pull			= Port::_cfg_::_Pull;
+			static const flag::flag				_Flag			= Port::_cfg_::_Flag;
 
 		private:
-			STATIC_ASSERT(FAIL_IF(_PinID != port::invalid_port && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
-			STATIC_ASSERT(FAIL_IF(_PinID != port::invalid_port && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
+			STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
+			STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
 
 			static const bool verified = config::check_params<_Mode, _Speed, _DefPinState, _Pull, _Flag>::verified;
 
@@ -651,20 +651,20 @@ namespace outputs {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-class gpio_dummy_t
+class gpio_dummy
 {
 public:
 	class _cfg_
 	{
 	public:
-		static const port::pins				_PinID			= port::invalid_port;
+		static const pin_id::pin_id			_PinID			= pin_id::invalid;
 		static const stm32::port::address	_Port			= stm32::port::inv_address;
 		static const stm32::port::pin		_Pin			= stm32::port::inv_pin;
-		static const config::mode			_Mode			= config::analog;
-		static const config::speed			_Speed			= config::speed_freq_low;
+		static const mode::mode				_Mode			= mode::analog;
+		static const speed::speed			_Speed			= speed::low;
 		static const state::state			_DefPinState	= state::reset;
-		static const config::pull_mode		_Pull			= config::pull_no;
-		static const config::flag			_Flag			= config::flag_no;
+		static const pull::pull				_Pull			= pull::no;
+		static const flag::flag				_Flag			= flag::flag_no;
 
 		static const uint32_t _cr = 0;
 	
@@ -678,19 +678,21 @@ public:
 	};
 };
 
+typedef gpio_dummy gpio_invalid;
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <class p00 = gpio_dummy_t, class p01 = gpio_dummy_t, class p02 = gpio_dummy_t, class p03 = gpio_dummy_t,
-		  class p04 = gpio_dummy_t, class p05 = gpio_dummy_t, class p06 = gpio_dummy_t, class p07 = gpio_dummy_t,
-		  class p08 = gpio_dummy_t, class p09 = gpio_dummy_t, class p10 = gpio_dummy_t, class p11 = gpio_dummy_t,
-		  class p12 = gpio_dummy_t, class p13 = gpio_dummy_t, class p14 = gpio_dummy_t, class p15 = gpio_dummy_t,
-		  class p16 = gpio_dummy_t, class p17 = gpio_dummy_t, class p18 = gpio_dummy_t, class p19 = gpio_dummy_t,
-		  class p20 = gpio_dummy_t, class p21 = gpio_dummy_t, class p22 = gpio_dummy_t, class p23 = gpio_dummy_t,
-		  class p24 = gpio_dummy_t, class p25 = gpio_dummy_t, class p26 = gpio_dummy_t, class p27 = gpio_dummy_t,
-		  class p28 = gpio_dummy_t, class p29 = gpio_dummy_t, class p30 = gpio_dummy_t, class p31 = gpio_dummy_t,
-		  class p32 = gpio_dummy_t, class p33 = gpio_dummy_t, class p34 = gpio_dummy_t, class p35 = gpio_dummy_t,
-		  class p36 = gpio_dummy_t, class p37 = gpio_dummy_t, class p38 = gpio_dummy_t, class p39 = gpio_dummy_t>
+template <class p00 = gpio_dummy, class p01 = gpio_dummy, class p02 = gpio_dummy, class p03 = gpio_dummy,
+		  class p04 = gpio_dummy, class p05 = gpio_dummy, class p06 = gpio_dummy, class p07 = gpio_dummy,
+		  class p08 = gpio_dummy, class p09 = gpio_dummy, class p10 = gpio_dummy, class p11 = gpio_dummy,
+		  class p12 = gpio_dummy, class p13 = gpio_dummy, class p14 = gpio_dummy, class p15 = gpio_dummy,
+		  class p16 = gpio_dummy, class p17 = gpio_dummy, class p18 = gpio_dummy, class p19 = gpio_dummy,
+		  class p20 = gpio_dummy, class p21 = gpio_dummy, class p22 = gpio_dummy, class p23 = gpio_dummy,
+		  class p24 = gpio_dummy, class p25 = gpio_dummy, class p26 = gpio_dummy, class p27 = gpio_dummy,
+		  class p28 = gpio_dummy, class p29 = gpio_dummy, class p30 = gpio_dummy, class p31 = gpio_dummy,
+		  class p32 = gpio_dummy, class p33 = gpio_dummy, class p34 = gpio_dummy, class p35 = gpio_dummy,
+		  class p36 = gpio_dummy, class p37 = gpio_dummy, class p38 = gpio_dummy, class p39 = gpio_dummy>
 class atomic
 {
 #define ASSEMBLE_EXP(exp, ...)				__ASSEM_##exp##(p00, __VA_ARGS__) __ASSEM_##exp##(p01, __VA_ARGS__) \

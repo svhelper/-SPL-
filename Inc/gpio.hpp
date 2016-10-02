@@ -20,7 +20,7 @@ namespace gpio {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-namespace port {
+namespace pin_id {
 
 typedef enum
 {
@@ -321,10 +321,10 @@ typedef enum
 	PI30,
 	PI31,
 
-	invalid_port			= 0xFFFF,
-} pins;
+	invalid			= 0xFFFF,
+} pin_id;
 
-} // namespace port
+} // namespace pin_id
 
 
 /************************************************************************/
@@ -343,139 +343,155 @@ typedef enum state
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
+namespace mode {
+typedef enum
+{
+	analog,
+	input,
+	output,
+	alt_input,
+	alt_output,
+} mode;
+} // namespace mode
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+namespace flag {
+typedef enum
+{
+	flags_mode_position	= 8,
+	flags_mode_mask		= (0xFF << flags_mode_position),
+	
+	flag_no				= 0,				/*!< No flags                                                                       */
+
+	flags_analog		= (mode::analog << 8),
+
+	flags_input			= (mode::input << 8),
+	input_int_rising,						/*!< External Interrupt Mode with Rising edge trigger detection                     */
+	input_int_falling,						/*!< External Interrupt Mode with Falling edge trigger detection                    */
+	input_int_both,							/*!< External Interrupt Mode with both of Rising and Falling edge trigger detection */
+	input_evt_rising,						/*!< External Event Mode with Rising edge trigger detection                         */
+	input_evt_falling,						/*!< External Event Mode with Falling edge trigger detection                        */
+	input_evt_both,							/*!< External Event Mode with both of Rising and Falling edge trigger detection     */
+	
+	flags_output		= (mode::output << 8),
+	output_push_pull,						/*!< Output Push Pull Mode                                                          */
+	output_open_drain,						/*!< Output Open Drain Mode                                                         */
+
+	flags_alt_input		= (mode::alt_input << 8),
+
+	flags_alt_output	= (mode::alt_output << 8),
+	alt_output_push_pull,					/*!< Output Push Pull Mode                                                          */
+	alt_output_open_drain,					/*!< Output Open Drain Mode                                                         */
+} flag;
+} // namespace flag
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+namespace speed {
+typedef enum
+{
+	low,		/*!< Low speed */
+	medium,	/*!< Medium speed */
+	high,	/*!< High speed */
+} speed;
+} // namespace speed
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+namespace pull {
+	typedef enum
+	{
+		no,			/*!< No Pull-up or Pull-down activation  */
+		up,			/*!< Pull-up activation                  */
+		down,		/*!< Pull-down activation                */
+	} pull;
+} // namespace pull
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 namespace config {
 
 	//////////////////////////////////////////////////////////////////////////
-	typedef enum
-	{
-		analog,
-		input,
-		output,
-		alt_input,
-		alt_output,
-	} mode;
-	
-	//////////////////////////////////////////////////////////////////////////
-	typedef enum
-	{
-		flags_mode_position	= 8,
-		flags_mode_mask		= (0xFF << flags_mode_position),
-		
-		flag_no				= 0,				/*!< No flags                                                                       */
-
-		flags_analog		= (analog << 8),
-
-		flags_input			= (input << 8),
-		input_int_rising,						/*!< External Interrupt Mode with Rising edge trigger detection                     */
-		input_int_falling,						/*!< External Interrupt Mode with Falling edge trigger detection                    */
-		input_int_both,							/*!< External Interrupt Mode with both of Rising and Falling edge trigger detection */
-		input_evt_rising,						/*!< External Event Mode with Rising edge trigger detection                         */
-		input_evt_falling,						/*!< External Event Mode with Falling edge trigger detection                        */
-		input_evt_both,							/*!< External Event Mode with both of Rising and Falling edge trigger detection     */
-		
-		flags_output		= (output << 8),
-		output_push_pull,						/*!< Output Push Pull Mode                                                          */
-		output_open_drain,						/*!< Output Open Drain Mode                                                         */
-
-		flags_alt_input		= (alt_input << 8),
-
-		flags_alt_output	= (alt_output << 8),
-		alt_output_push_pull,					/*!< Output Push Pull Mode                                                          */
-		alt_output_open_drain,					/*!< Output Open Drain Mode                                                         */
-	} flag;
-
-	//////////////////////////////////////////////////////////////////////////
-	typedef enum
-	{
-		speed_freq_low,		/*!< Low speed */
-		speed_freq_medium,	/*!< Medium speed */
-		speed_freq_high,	/*!< High speed */
-	} speed;
-
-	//////////////////////////////////////////////////////////////////////////
-	typedef enum
-	{
-		pull_no,			/*!< No Pull-up or Pull-down activation  */
-		pull_up,			/*!< Pull-up activation                  */
-		pull_down,			/*!< Pull-down activation                */
-	} pull_mode;
-	
-	//////////////////////////////////////////////////////////////////////////
 	template <
-		config::mode		Mode      ,
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		mode::mode		Mode      ,
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
 	class check_params;
 
 	template <
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
-	class check_params<analog, Speed, DefState, Pull, Flag>
+	class check_params<mode::analog, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(Pull == config::pull_no, "The ANALOG configuration of PIN, must not be configured in PULL UP/DOWN mode");
-		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_analog, "Wrong flag for the ANALOG configuration of PIN");
+		STATIC_ASSERT(Pull == pull::no, "The ANALOG configuration of PIN, must not be configured in PULL UP/DOWN mode");
+		STATIC_ASSERT(Flag == flag::flag_no || (Flag & flag::flags_mode_mask) == flag::flags_analog, "Wrong flag for the ANALOG configuration of PIN");
 
 	public:
 		static const bool verified = true;
 	};
 	
 	template <
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
-	class check_params<input, Speed, DefState, Pull, Flag>
+	class check_params<mode::input, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_input, "Wrong flag for the INPUT configuration of PIN");
+		STATIC_ASSERT(Flag == flag::flag_no || (Flag & flag::flags_mode_mask) == flag::flags_input, "Wrong flag for the INPUT configuration of PIN");
 		
 	public:
 		static const bool verified = true;
 	};
 	
 	template <
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
-	class check_params<output, Speed, DefState, Pull, Flag>
+	class check_params<mode::output, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_output, "Wrong flag for the OUTPUT configuration of PIN");
+		STATIC_ASSERT(Flag == flag::flag_no || (Flag & flag::flags_mode_mask) == flag::flags_output, "Wrong flag for the OUTPUT configuration of PIN");
 		
 	public:
 		static const bool verified = true;
 	};
 	
 	template <
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
-	class check_params<alt_input, Speed, DefState, Pull, Flag>
+	class check_params<mode::alt_input, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_alt_input, "Wrong flag for the ALTERNATIVE INPUT configuration of PIN");
+		STATIC_ASSERT(Flag == flag::flag_no || (Flag & flag::flags_mode_mask) == flag::flags_alt_input, "Wrong flag for the ALTERNATIVE INPUT configuration of PIN");
 		
 	public:
 		static const bool verified = true;
 	};
 	
 	template <
-		config::speed		Speed     ,
-		state::state		DefState  ,
-		config::pull_mode	Pull      ,
-		config::flag		Flag      
+		speed::speed	Speed     ,
+		state::state	DefState  ,
+		pull::pull		Pull      ,
+		flag::flag		Flag      
 		>
-	class check_params<alt_output, Speed, DefState, Pull, Flag>
+	class check_params<mode::alt_output, Speed, DefState, Pull, Flag>
 	{
-		STATIC_ASSERT(Flag == config::flag_no || (Flag & flags_mode_mask) == flags_alt_output, "Wrong flag for the ALTERNATIVE OUTPUT configuration of PIN");
+		STATIC_ASSERT(Flag == flag::flag_no || (Flag & flag::flags_mode_mask) == flag::flags_alt_output, "Wrong flag for the ALTERNATIVE OUTPUT configuration of PIN");
 		
 	public:
 		static const bool verified = true;
@@ -486,12 +502,12 @@ namespace config {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/	
-template <	port::pins			Pin       = port::invalid_port,
-			config::mode		Mode      = config::analog,
-			config::speed		Speed     = config::speed_freq_low,
-			state::state		DefState  = state::reset,
-			config::pull_mode	Pull      = config::pull_no,
-			config::flag		Flag      = config::flag_no
+template <	pin_id::pin_id	Pin       = pin_id::invalid,
+			mode::mode		Mode      = mode::analog,
+			speed::speed	Speed     = speed::low,
+			state::state	DefState  = state::reset,
+			pull::pull		Pull      = pull::no,
+			flag::flag		Flag      = flag::flag_no
 		>
 class gpio_base;
 
