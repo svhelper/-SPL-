@@ -1288,14 +1288,6 @@ class pll_usb_max : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz
 
 
 //////////////////////////////////////////////////////////////////////////	
-
-typedef ::mcu::stm32::clock::sysclock_auto<osc_hsi_def       > sysclock_osc_hsi_def;
-typedef ::mcu::stm32::clock::sysclock_auto<osc_hse_def       > sysclock_osc_hse_def;
-typedef ::mcu::stm32::clock::sysclock_auto<pll_hsi_def       > sysclock_pll_hsi_def;
-typedef ::mcu::stm32::clock::sysclock_auto<pll_hse_def       > sysclock_pll_hse_def;
-typedef ::mcu::stm32::clock::sysclock_auto<pll_hse_bypass_def> sysclock_pll_hse_bypass_def;
-
-//------------------------------------------------------------------------
 template<
 		class		ClockSource																,
 		uint32_t	CortexSysTimer_ms			= 1000										,
@@ -1305,6 +1297,14 @@ template<
 		uint32_t	ADCCLK_Max_Hz				= ::mcu::stm32::clock::limits::max::ADCCLK	
 	>
 class sysclock_auto : public ::mcu::stm32::clock::sysclock_auto< ClockSource, HCLK_Max_Hz, APB1CLK_Max_Hz, APB2CLK_Max_Hz, 1000000/*Hz*/ / CortexSysTimer_ms, ADCCLK_Max_Hz > {};
+
+//------------------------------------------------------------------------
+
+typedef sysclock_auto<osc_hsi_def       > sysclock_osc_hsi_def;
+typedef sysclock_auto<osc_hse_def       > sysclock_osc_hse_def;
+typedef sysclock_auto<pll_hsi_def       > sysclock_pll_hsi_def;
+typedef sysclock_auto<pll_hse_def       > sysclock_pll_hse_def;
+typedef sysclock_auto<pll_hse_bypass_def> sysclock_pll_hse_bypass_def;
 
 } // namespace clock
 
