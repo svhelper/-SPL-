@@ -368,12 +368,11 @@ private:
 		static const stm32::port::address PORT   = stm32::port::convert<PinID>::to_address;
 		static const stm32::port::pin     PIN    = stm32::port::convert<PinID>::to_pin;
 		
-		//static const uint32_t ODR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->ODR), PIN);
-		//static const uint32_t IDR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->IDR), PIN);
+		//static const uint32_t _GPIO_ODR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->ODR), PIN);
+		//static const uint32_t _GPIO_IDR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->IDR), PIN);
 		
-		static const uint32_t GPIO_OFFSET = ((uint32_t)PORT - PERIPH_BASE);
-		static const uint32_t ODR_BB      = PERIPH_BB_BASE + (GPIO_OFFSET + ((uint32_t)(&((GPIO_TypeDef*)0)->ODR))) * 32 + (PIN) * 4;
-		static const uint32_t IDR_BB      = PERIPH_BB_BASE + (GPIO_OFFSET + ((uint32_t)(&((GPIO_TypeDef*)0)->IDR))) * 32 + (PIN) * 4;
+		static const uint32_t _GPIO_ODR_BB      = PERIPH_BB_BASE + ((uint32_t)PORT - PERIPH_BASE) * 32 + ((uint32_t)&((GPIO_TypeDef*)0)->ODR) * 32 + (PIN) * 4;
+		static const uint32_t _GPIO_IDR_BB      = PERIPH_BB_BASE + ((uint32_t)PORT - PERIPH_BASE) * 32 + ((uint32_t)&((GPIO_TypeDef*)0)->IDR) * 32 + (PIN) * 4;
 	};
 	
 protected:
@@ -506,33 +505,33 @@ public:
 	static bool get()
 	{
 		// accessible at any time
-		return IS_BB_REG_SET(_const_::IDR_BB);
+		return IS_BB_REG_SET(_const_::_GPIO_IDR_BB);
 	}
 	static bool get_out()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		return IS_BB_REG_SET(_const_::ODR_BB);
+		return IS_BB_REG_SET(_const_::_GPIO_ODR_BB);
 	}
 	static void set()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		SET_BB_REG(_const_::ODR_BB);
+		SET_BB_REG(_const_::_GPIO_ODR_BB);
 	}
 	static void reset()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		RESET_BB_REG(_const_::ODR_BB);
+		RESET_BB_REG(_const_::_GPIO_ODR_BB);
 	}
 
 	static void write(bool val)
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		WRITE_BB_REG(_const_::ODR_BB, val);
+		WRITE_BB_REG(_const_::_GPIO_ODR_BB, val);
 	}
 	static bool read()
 	{
 		// accessible at any time
-		return IS_BB_REG_SET(_const_::IDR_BB);
+		return IS_BB_REG_SET(_const_::_GPIO_IDR_BB);
 	}
 	
 	template <state::state NewState>
@@ -591,66 +590,6 @@ class alt_output : public gpio_base<PinID, mode::alt_output, Speed, state::reset
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-namespace outputs {
-	template <	class Port,
-				state::state State
-			>
-	class write
-	{
-	private:
-		class _const_
-		{
-			friend class gpio_base;
-			
-			static const stm32::port::address PORT   = Port::_cfg_::_Port;
-			static const stm32::port::pin     PIN    = Port::_cfg_::_Pin;
-			
-			static const uint32_t GPIO_OFFSET = ((uint32_t)PORT - PERIPH_BASE);
-			static const uint32_t ODR_BB      = PERIPH_BB_BASE + (GPIO_OFFSET + ((uint32_t)(&((GPIO_TypeDef*)0)->ODR))) * 32 + (PIN) * 4;
-			static const uint32_t IDR_BB      = PERIPH_BB_BASE + (GPIO_OFFSET + ((uint32_t)(&((GPIO_TypeDef*)0)->IDR))) * 32 + (PIN) * 4;
-		};
-		
-	public:
-		class _cfg_
-		{
-		public:
-			static const pin_id::pin_id			_PinID			= Port::_cfg_::_PinID;
-			static const stm32::port::address	_Port			= Port::_cfg_::_Port;
-			static const stm32::port::pin		_Pin			= Port::_cfg_::_Pin;
-			static const mode::mode			_Mode			= Port::_cfg_::_Mode;
-			static const speed::speed			_Speed			= Port::_cfg_::_Speed;
-			static const state::state			_DefPinState	= State;
-			static const pull::pull				_Pull			= Port::_cfg_::_Pull;
-			static const flag::flag				_Flag			= Port::_cfg_::_Flag;
-
-		private:
-			STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
-			STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
-
-			static const bool verified = config::check_params<_Mode, _Speed, _DefPinState, _Pull, _Flag>::verified;
-
-			typedef stm32::registers::REG_GPIO<_Mode, _Speed, _DefPinState, _Pull, _Flag, _Port, _Pin> REG_GPIO;
-			typedef stm32::registers::REG_RCC<_Mode, _PinID> REG_RCC;
-		
-		public:
-			static const uint32_t _cr = REG_GPIO::CR;
-
-			static const uint32_t _odr_mask  = REG_GPIO::ODR_MASK;
-			static const uint32_t _odr_val   = REG_GPIO::ODR;
-			static const uint32_t _odr_set   = REG_GPIO::ODR_SET;
-			static const uint32_t _odr_reset = REG_GPIO::ODR_RESET;
-			
-			static const uint32_t _rcc_apb2enr_mask = REG_RCC::APB2ENR_MASK;
-			static const uint32_t _rcc_apb2enr      = REG_RCC::APB2ENR;
-		};
-	};
-
-} // namespace outputs
-
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
 class gpio_dummy
 {
 public:
@@ -678,21 +617,14 @@ public:
 	};
 };
 
-typedef gpio_dummy gpio_invalid;
-
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <class p00 = gpio_dummy, class p01 = gpio_dummy, class p02 = gpio_dummy, class p03 = gpio_dummy,
-		  class p04 = gpio_dummy, class p05 = gpio_dummy, class p06 = gpio_dummy, class p07 = gpio_dummy,
-		  class p08 = gpio_dummy, class p09 = gpio_dummy, class p10 = gpio_dummy, class p11 = gpio_dummy,
-		  class p12 = gpio_dummy, class p13 = gpio_dummy, class p14 = gpio_dummy, class p15 = gpio_dummy,
-		  class p16 = gpio_dummy, class p17 = gpio_dummy, class p18 = gpio_dummy, class p19 = gpio_dummy,
-		  class p20 = gpio_dummy, class p21 = gpio_dummy, class p22 = gpio_dummy, class p23 = gpio_dummy,
-		  class p24 = gpio_dummy, class p25 = gpio_dummy, class p26 = gpio_dummy, class p27 = gpio_dummy,
-		  class p28 = gpio_dummy, class p29 = gpio_dummy, class p30 = gpio_dummy, class p31 = gpio_dummy,
-		  class p32 = gpio_dummy, class p33 = gpio_dummy, class p34 = gpio_dummy, class p35 = gpio_dummy,
-		  class p36 = gpio_dummy, class p37 = gpio_dummy, class p38 = gpio_dummy, class p39 = gpio_dummy>
+template <class p00, class p01, class p02, class p03, class p04, class p05, class p06, class p07,
+		  class p08, class p09, class p10, class p11, class p12, class p13, class p14, class p15,
+		  class p16, class p17, class p18, class p19, class p20, class p21, class p22, class p23,
+		  class p24, class p25, class p26, class p27, class p28, class p29, class p30, class p31,
+		  class p32, class p33, class p34, class p35, class p36, class p37, class p38, class p39>
 class atomic
 {
 #define ASSEMBLE_EXP(exp, ...)				__ASSEM_##exp##(p00, __VA_ARGS__) __ASSEM_##exp##(p01, __VA_ARGS__) \
@@ -780,7 +712,7 @@ public:
 	
 	static void update()
 	{
-#define __INIT_PORT(PORT)		\
+#define __UPDATE_PORT(PORT)		\
 		do { \
 			static const uint32_t odr_mask = ASSEMBLE_IF(stm32::port::PORT, _cfg_::_odr_mask); \
 			static const uint32_t odr_val  = odr_mask & ASSEMBLE_ALL(_cfg_::_odr_val); \
@@ -797,22 +729,22 @@ public:
 				MODIFY_REG(GPIO##PORT->CRH, crh_mask, crh_val); \
 		} while(0)
 
-		IF_GPIOA_EXISTS(__INIT_PORT(A);)
-		IF_GPIOB_EXISTS(__INIT_PORT(B);)
-		IF_GPIOC_EXISTS(__INIT_PORT(C);)
-		IF_GPIOD_EXISTS(__INIT_PORT(D);)
-		IF_GPIOE_EXISTS(__INIT_PORT(E);)
-		IF_GPIOF_EXISTS(__INIT_PORT(F);)
-		IF_GPIOG_EXISTS(__INIT_PORT(G);)
-		IF_GPIOH_EXISTS(__INIT_PORT(H);)
-		IF_GPIOI_EXISTS(__INIT_PORT(I);)
-#undef __INIT_PORT
+		IF_GPIOA_EXISTS(__UPDATE_PORT(A);)
+		IF_GPIOB_EXISTS(__UPDATE_PORT(B);)
+		IF_GPIOC_EXISTS(__UPDATE_PORT(C);)
+		IF_GPIOD_EXISTS(__UPDATE_PORT(D);)
+		IF_GPIOE_EXISTS(__UPDATE_PORT(E);)
+		IF_GPIOF_EXISTS(__UPDATE_PORT(F);)
+		IF_GPIOG_EXISTS(__UPDATE_PORT(G);)
+		IF_GPIOH_EXISTS(__UPDATE_PORT(H);)
+		IF_GPIOI_EXISTS(__UPDATE_PORT(I);)
+#undef __UPDATE_PORT
 
 	}
 
 	static void write()
 	{
-#define __INIT_PORT(PORT)		\
+#define __WRITE_PORT(PORT)		\
 		do { \
 			static const uint32_t odr_mask = ASSEMBLE_IF(stm32::port::PORT, _cfg_::_odr_mask); \
 			static const uint32_t odr_val  = odr_mask & ASSEMBLE_ALL(_cfg_::_odr_val); \
@@ -821,22 +753,22 @@ public:
 				MODIFY_REG(GPIO##PORT->ODR, odr_mask, odr_val); \
 		} while(0)
 
-		IF_GPIOA_EXISTS(__INIT_PORT(A);)
-		IF_GPIOB_EXISTS(__INIT_PORT(B);)
-		IF_GPIOC_EXISTS(__INIT_PORT(C);)
-		IF_GPIOD_EXISTS(__INIT_PORT(D);)
-		IF_GPIOE_EXISTS(__INIT_PORT(E);)
-		IF_GPIOF_EXISTS(__INIT_PORT(F);)
-		IF_GPIOG_EXISTS(__INIT_PORT(G);)
-		IF_GPIOH_EXISTS(__INIT_PORT(H);)
-		IF_GPIOI_EXISTS(__INIT_PORT(I);)
-#undef __INIT_PORT
+		IF_GPIOA_EXISTS(__WRITE_PORT(A);)
+		IF_GPIOB_EXISTS(__WRITE_PORT(B);)
+		IF_GPIOC_EXISTS(__WRITE_PORT(C);)
+		IF_GPIOD_EXISTS(__WRITE_PORT(D);)
+		IF_GPIOE_EXISTS(__WRITE_PORT(E);)
+		IF_GPIOF_EXISTS(__WRITE_PORT(F);)
+		IF_GPIOG_EXISTS(__WRITE_PORT(G);)
+		IF_GPIOH_EXISTS(__WRITE_PORT(H);)
+		IF_GPIOI_EXISTS(__WRITE_PORT(I);)
+#undef __WRITE_PORT
 
 	}
 
 	static void set()
 	{
-#define __INIT_PORT(PORT)		\
+#define __SET_PORT(PORT)		\
 		do { \
 			static const uint32_t odr_mask = ASSEMBLE_IF(stm32::port::PORT, _cfg_::_odr_mask); \
 			/*static const uint32_t odr_set  = odr_mask & ASSEMBLE_ALL(_cfg_::_odr_set);*/ \
@@ -845,22 +777,22 @@ public:
 				WRITE_REG(GPIO##PORT->BSRR, odr_mask); \
 		} while(0)
 
-		IF_GPIOA_EXISTS(__INIT_PORT(A);)
-		IF_GPIOB_EXISTS(__INIT_PORT(B);)
-		IF_GPIOC_EXISTS(__INIT_PORT(C);)
-		IF_GPIOD_EXISTS(__INIT_PORT(D);)
-		IF_GPIOE_EXISTS(__INIT_PORT(E);)
-		IF_GPIOF_EXISTS(__INIT_PORT(F);)
-		IF_GPIOG_EXISTS(__INIT_PORT(G);)
-		IF_GPIOH_EXISTS(__INIT_PORT(H);)
-		IF_GPIOI_EXISTS(__INIT_PORT(I);)
-#undef __INIT_PORT
+		IF_GPIOA_EXISTS(__SET_PORT(A);)
+		IF_GPIOB_EXISTS(__SET_PORT(B);)
+		IF_GPIOC_EXISTS(__SET_PORT(C);)
+		IF_GPIOD_EXISTS(__SET_PORT(D);)
+		IF_GPIOE_EXISTS(__SET_PORT(E);)
+		IF_GPIOF_EXISTS(__SET_PORT(F);)
+		IF_GPIOG_EXISTS(__SET_PORT(G);)
+		IF_GPIOH_EXISTS(__SET_PORT(H);)
+		IF_GPIOI_EXISTS(__SET_PORT(I);)
+#undef __SET_PORT
 
 	}
 
 	static void reset()
 	{
-#define __INIT_PORT(PORT)		\
+#define __RESET_PORT(PORT)		\
 		do { \
 			static const uint32_t odr_mask = ASSEMBLE_IF(stm32::port::PORT, _cfg_::_odr_mask); \
 			/*static const uint32_t odr_reset  = odr_mask & ASSEMBLE_ALL(_cfg_::_odr_reset);*/ \
@@ -869,16 +801,16 @@ public:
 				WRITE_REG(GPIO##PORT->BRR, odr_mask); \
 		} while(0)
 
-		IF_GPIOA_EXISTS(__INIT_PORT(A);)
-		IF_GPIOB_EXISTS(__INIT_PORT(B);)
-		IF_GPIOC_EXISTS(__INIT_PORT(C);)
-		IF_GPIOD_EXISTS(__INIT_PORT(D);)
-		IF_GPIOE_EXISTS(__INIT_PORT(E);)
-		IF_GPIOF_EXISTS(__INIT_PORT(F);)
-		IF_GPIOG_EXISTS(__INIT_PORT(G);)
-		IF_GPIOH_EXISTS(__INIT_PORT(H);)
-		IF_GPIOI_EXISTS(__INIT_PORT(I);)
-#undef __INIT_PORT
+		IF_GPIOA_EXISTS(__RESET_PORT(A);)
+		IF_GPIOB_EXISTS(__RESET_PORT(B);)
+		IF_GPIOC_EXISTS(__RESET_PORT(C);)
+		IF_GPIOD_EXISTS(__RESET_PORT(D);)
+		IF_GPIOE_EXISTS(__RESET_PORT(E);)
+		IF_GPIOF_EXISTS(__RESET_PORT(F);)
+		IF_GPIOG_EXISTS(__RESET_PORT(G);)
+		IF_GPIOH_EXISTS(__RESET_PORT(H);)
+		IF_GPIOI_EXISTS(__RESET_PORT(I);)
+#undef __RESET_PORT
 
 	}
 };
