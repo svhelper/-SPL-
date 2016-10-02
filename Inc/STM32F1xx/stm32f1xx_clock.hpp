@@ -10,74 +10,15 @@
 #include <stdbool.h>
 #include <static_assert.hpp>
 
+#include <clock.hpp>
+
 //////////////////////////////////////////////////////////////////////////
 #include <stm32f1xx.h>
-
-
-//////////////////////////////////////////////////////////////////////////
-#ifndef HSE_VALUE
-#	define HSE_VALUE				8000000UL
-#endif /* HSE_VALUE */
-
-#ifndef LSE_VALUE
-#	define LSE_VALUE				32768UL
-#endif /* LSE_VALUE */
-
-
-#ifndef HSI_VALUE
-#	define HSI_VALUE				8000000UL  /* 8MHz */
-#endif /* HSI_VALUE */
-
-#ifndef LSI_VALUE
-#	define LSI_VALUE				40000UL  /* 40kHz */
-#endif /* LSI_VALUE */
-
-#ifndef HSI_CALIBRATION_DEFAULT
-#	define HSI_CALIBRATION_DEFAULT	0x10UL
-#endif /*HSI_CALIBRATION_DEFAULT*/
-
-#ifndef NVIC_PRIORITYGROUP
-#	define  NVIC_PRIORITYGROUP		NVIC_PRIORITYGROUP_4
-#endif /*TICK_INT_PRIORITY*/
-
-#ifndef TICK_INT_PRIORITY
-#	define  TICK_INT_PRIORITY		0x00UL    /*!< tick interrupt priority (lowest by default)  */
-#endif /*TICK_INT_PRIORITY*/
-
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
 namespace mcu {
-
-namespace clock {
-	
-	namespace state {
-		typedef enum
-		{
-			disable,
-			enable = !disable,
-		} state;
-	} // namespace state
-
-	namespace config {
-		typedef enum
-		{
-			high_speed_internal,
-			low_speed_internal,
-
-			high_speed_external,
-			high_speed_external_bypass,
-			low_speed_external,
-			low_speed_external_bypass,
-		} osc_type;
-	} // namespace config
-	
-} // namespace clock
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
 namespace stm32 {
 namespace clock {
 
@@ -123,15 +64,15 @@ namespace clock {
 	//////////////////////////////////////////////////////////////////////////
 	namespace config {
 		
-		template < ::mcu::clock::config::osc_type type, uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration = 0x7FFFFFFF>
+		template < ::mcu::clock::osc_type::osc_type type, uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration = ::mcu::clock::CALIBRATION_DEF>
 		class osc_cfg;
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::high_speed_internal, Clock_Hz, state, calibration>
+		class osc_cfg< ::mcu::clock::osc_type::high_speed_internal, Clock_Hz, state, calibration>
 		{
 		private:
-			static const int32_t calibration_val = (calibration == 0x7FFFFFFF) ? HSI_CALIBRATION_DEFAULT : calibration;
+			static const int32_t calibration_val = (calibration == ::mcu::clock::CALIBRATION_DEF) ? HSI_CALIBRATION_DEFAULT : calibration;
 		
 			STATIC_ASSERT(Clock_Hz == HSI_VALUE, "HSI clock is invalid");
 			STATIC_ASSERT(calibration_val >= 0x00 && calibration_val <= 0x1F, "HSI calibration value out of range");
@@ -140,16 +81,16 @@ namespace clock {
 			static const uint32_t _RCC_CR_HSIRDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSIRDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::high_speed_internal;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration_val;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::high_speed_internal;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration_val;
 		
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 		
 			static void init()
 			{
@@ -185,26 +126,26 @@ namespace clock {
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::low_speed_internal, Clock_Hz, state, calibration >
+		class osc_cfg< ::mcu::clock::osc_type::low_speed_internal, Clock_Hz, state, calibration >
 		{
 		private:
 			STATIC_ASSERT(Clock_Hz == LSI_VALUE, "LSI clock is invalid");
-			STATIC_ASSERT(calibration == 0x7FFFFFFF, "LSI has not calibration");
+			STATIC_ASSERT(calibration == ::mcu::clock::CALIBRATION_DEF, "LSI has not calibration");
 		
 			static const uint32_t _RCC_CSR_LSION_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CSR, RCC_CSR_LSION_Pos);
 			static const uint32_t _RCC_CSR_LSIRDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CSR, RCC_CSR_LSIRDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::low_speed_internal;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::low_speed_internal;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration;
 		
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 
 			static void init()
 			{
@@ -240,27 +181,27 @@ namespace clock {
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::high_speed_external, Clock_Hz, state, calibration>
+		class osc_cfg< ::mcu::clock::osc_type::high_speed_external, Clock_Hz, state, calibration>
 		{
 		private:
 			STATIC_ASSERT(Clock_Hz >= mcu::stm32::clock::limits::min::HSECLK && Clock_Hz <= mcu::stm32::clock::limits::max::HSECLK, "HSE clock out of range");
-			STATIC_ASSERT(calibration == 0x7FFFFFFF, "HSE has not calibration");
+			STATIC_ASSERT(calibration == ::mcu::clock::CALIBRATION_DEF, "HSE has not calibration");
 		
 			static const uint32_t _RCC_CR_HSEON_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSEON_Pos);
 			static const uint32_t _RCC_CR_HSEBYP_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSEBYP_Pos);
 			static const uint32_t _RCC_CR_HSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSERDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::high_speed_external;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::high_speed_external;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration;
 
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 		
 			static void init()
 			{
@@ -298,27 +239,27 @@ namespace clock {
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::high_speed_external_bypass, Clock_Hz, state, calibration>
+		class osc_cfg< ::mcu::clock::osc_type::high_speed_external_bypass, Clock_Hz, state, calibration>
 		{
 		private:
 			STATIC_ASSERT(Clock_Hz >= mcu::stm32::clock::limits::min::HSECLK && Clock_Hz <= mcu::stm32::clock::limits::max::HSECLK, "HSE clock out of range");
-			STATIC_ASSERT(calibration == 0x7FFFFFFF, "HSE has not calibration");
+			STATIC_ASSERT(calibration == ::mcu::clock::CALIBRATION_DEF, "HSE has not calibration");
 		
 			static const uint32_t _RCC_CR_HSEON_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSEON_Pos);
 			static const uint32_t _RCC_CR_HSEBYP_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSEBYP_Pos);
 			static const uint32_t _RCC_CR_HSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSERDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::high_speed_external_bypass;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::high_speed_external_bypass;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration;
 
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 		
 			static void init()
 			{
@@ -356,11 +297,11 @@ namespace clock {
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::low_speed_external, Clock_Hz, state, calibration>
+		class osc_cfg< ::mcu::clock::osc_type::low_speed_external, Clock_Hz, state, calibration>
 		{
 		private:
 			STATIC_ASSERT(Clock_Hz >= mcu::stm32::clock::limits::min::LSECLK && Clock_Hz <= mcu::stm32::clock::limits::max::LSECLK, "LSE clock out of range");
-			STATIC_ASSERT(calibration == 0x7FFFFFFF, "LSE has not calibration");
+			STATIC_ASSERT(calibration == ::mcu::clock::CALIBRATION_DEF, "LSE has not calibration");
 		
 			static const uint32_t _RCC_APB1ENR_PWREN_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->APB1ENR, RCC_APB1ENR_PWREN_Pos);
 			static const uint32_t _PWR_CR_DBP_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&PWR->CR, PWR_CR_DBP_Pos);
@@ -370,16 +311,16 @@ namespace clock {
 			static const uint32_t _RCC_BDCR_LSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->BDCR, RCC_BDCR_LSERDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::low_speed_external;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::low_speed_external;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration;
 
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 		
 			static void init()
 			{
@@ -428,11 +369,11 @@ namespace clock {
 
 		//------------------------------------------------------------------------
 		template <uint32_t Clock_Hz, ::mcu::clock::state::state state, int32_t calibration>
-		class osc_cfg< ::mcu::clock::config::low_speed_external_bypass, Clock_Hz, state, calibration>
+		class osc_cfg< ::mcu::clock::osc_type::low_speed_external_bypass, Clock_Hz, state, calibration>
 		{
 		private:
 			STATIC_ASSERT(Clock_Hz >= mcu::stm32::clock::limits::min::LSECLK && Clock_Hz <= mcu::stm32::clock::limits::max::LSECLK, "LSE clock out of range");
-			STATIC_ASSERT(calibration == 0x7FFFFFFF, "LSE has not calibration");
+			STATIC_ASSERT(calibration == ::mcu::clock::CALIBRATION_DEF, "LSE has not calibration");
 		
 			static const uint32_t _RCC_APB1ENR_PWREN_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->APB1ENR, RCC_APB1ENR_PWREN_Pos);
 			static const uint32_t _PWR_CR_DBP_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&PWR->CR, PWR_CR_DBP_Pos);
@@ -442,16 +383,16 @@ namespace clock {
 			static const uint32_t _RCC_BDCR_LSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->BDCR, RCC_BDCR_LSERDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= ::mcu::clock::config::low_speed_external_bypass;
-			static const uint32_t						_Clock_Hz		= Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= ::mcu::clock::osc_type::low_speed_external_bypass;
+			static const uint32_t							_Clock_Hz		= Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= calibration;
 
-			static const uint32_t						_pll_prediv		= 1;
-			static const bool							_usb_div_1_5	= false;
-			static const uint32_t						_pll_mul		= 1;
-			static const uint32_t						_usb_clock		= 0;
-			static const bool							_usb_active		= false;
+			static const uint32_t							_pll_prediv		= 1;
+			static const bool								_usb_div_1_5	= false;
+			static const uint32_t							_pll_mul		= 1;
+			static const uint32_t							_usb_clock		= 0;
+			static const bool								_usb_active		= false;
 		
 			static void init()
 			{
@@ -501,10 +442,10 @@ namespace clock {
 
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		::mcu::clock::config::osc_type	type,
-		uint32_t						Clock_Hz = 0,
-		::mcu::clock::state::state		state = ::mcu::clock::state::enable,
-		int32_t							calibration = 0x7FFFFFFF
+		::mcu::clock::osc_type::osc_type	type,
+		uint32_t							Clock_Hz = 0,
+		::mcu::clock::state::state			state = ::mcu::clock::state::enable,
+		int32_t								calibration = ::mcu::clock::CALIBRATION_DEF
 		>
 	class osc
 	{
@@ -537,19 +478,19 @@ namespace clock {
 	};
 
 	//------------------------------------------------------------------------
-	typedef osc< ::mcu::clock::config::high_speed_internal			, HSI_VALUE> osc_hsi;
-	typedef osc< ::mcu::clock::config::low_speed_internal			, LSI_VALUE> osc_lsi;
+	typedef osc< ::mcu::clock::osc_type::high_speed_internal		, HSI_VALUE> osc_hsi;
+	typedef osc< ::mcu::clock::osc_type::low_speed_internal			, LSI_VALUE> osc_lsi;
 
-	typedef osc< ::mcu::clock::config::high_speed_external			, HSE_VALUE> osc_hse;
-	typedef osc< ::mcu::clock::config::high_speed_external_bypass	, HSE_VALUE> osc_hse_bypass;
-	typedef osc< ::mcu::clock::config::low_speed_external			, LSE_VALUE> osc_lse;
-	typedef osc< ::mcu::clock::config::low_speed_external_bypass	, LSE_VALUE> osc_lse_bypass;
+	typedef osc< ::mcu::clock::osc_type::high_speed_external		, HSE_VALUE> osc_hse;
+	typedef osc< ::mcu::clock::osc_type::high_speed_external_bypass	, HSE_VALUE> osc_hse_bypass;
+	typedef osc< ::mcu::clock::osc_type::low_speed_external			, LSE_VALUE> osc_lse;
+	typedef osc< ::mcu::clock::osc_type::low_speed_external_bypass	, LSE_VALUE> osc_lse_bypass;
 
 
 	//////////////////////////////////////////////////////////////////////////
 	namespace config {
 		
-		template < ::mcu::clock::config::osc_type type, typename OSC
+		template < ::mcu::clock::osc_type::osc_type type, typename OSC
 					, uint32_t ClockMin_Hz, uint32_t ClockMax_Hz, bool maximal
 					, ::mcu::clock::state::state state
 					, bool pll_usb >
@@ -721,9 +662,9 @@ namespace clock {
 				
 			public:
 				static const uint32_t	pll_prediv	= CFG::_maximal ? _pll_find_max::prediv : _pll_find_min::prediv;
-
+			
 			private:
-				typedef pll_find_cfg<CFG::_InClock_Hz / pll_prediv, CFG::_ClockMin_Hz, CFG::_ClockMax_Hz,
+				typedef pll_find_cfg<pll_prediv ? CFG::_InClock_Hz / pll_prediv : 0, CFG::_ClockMin_Hz, CFG::_ClockMax_Hz,
 					CFG::_maximal, CFG::_pll_mul_min, CFG::_pll_mul_max> _cfg_;
 				
 				typedef pll_find_usb_clock	< _cfg_, _cfg_::_maximal >	_pll_usb_cfg;
@@ -744,7 +685,7 @@ namespace clock {
 					, uint32_t ClockMin_Hz, uint32_t ClockMax_Hz, bool maximal
 					, ::mcu::clock::state::state state
 					, bool pll_usb >
-		class pll_cfg< ::mcu::clock::config::high_speed_internal, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
+		class pll_cfg< ::mcu::clock::osc_type::high_speed_internal, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
 		{
 		private:
 			typedef OSC osc;
@@ -755,16 +696,16 @@ namespace clock {
 			static const uint32_t _RCC_CR_PLLRDY_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_PLLRDY_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= osc::_cfg_::_OscType;
-			static const uint32_t						_Clock_Hz		= _pll_cfg::_Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= 0x7FFFFFFF;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= osc::_cfg_::_OscType;
+			static const uint32_t							_Clock_Hz		= _pll_cfg::_Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= ::mcu::clock::CALIBRATION_DEF;
 		
-			static const uint32_t						_pll_prediv		= _pll_cfg::pll_prediv	;
-			static const bool							_usb_div_1_5	= _pll_cfg::usb_div_1_5	;
-			static const uint32_t						_pll_mul		= _pll_cfg::pll_mul		;
-			static const uint32_t						_usb_clock		= _pll_cfg::usb_clock	;
-			static const bool							_usb_active		= _pll_cfg::usb_active	;
+			static const uint32_t							_pll_prediv		= _pll_cfg::pll_prediv	;
+			static const bool								_usb_div_1_5	= _pll_cfg::usb_div_1_5	;
+			static const uint32_t							_pll_mul		= _pll_cfg::pll_mul		;
+			static const uint32_t							_usb_clock		= _pll_cfg::usb_clock	;
+			static const bool								_usb_active		= _pll_cfg::usb_active	;
 		
 			STATIC_ASSERT(_pll_mul >= 2 && _pll_mul <= 16, "The required clock frequency cannot be reached");
 			STATIC_ASSERT(!pll_usb || _usb_active, "PLL cannot find clock frequency for USB");
@@ -824,7 +765,7 @@ namespace clock {
 					, uint32_t ClockMin_Hz, uint32_t ClockMax_Hz, bool maximal
 					, ::mcu::clock::state::state state
 					, bool pll_usb >
-		class pll_cfg< ::mcu::clock::config::high_speed_external, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
+		class pll_cfg< ::mcu::clock::osc_type::high_speed_external, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
 		{
 		private:
 			typedef OSC osc;
@@ -835,16 +776,16 @@ namespace clock {
 			static const uint32_t _RCC_CFGR_PLLXTPRE_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CFGR, RCC_CFGR_PLLXTPRE_Pos);
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= osc::_cfg_::_OscType;
-			static const uint32_t						_Clock_Hz		= _pll_cfg::_Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= state;
-			static const int32_t						_Calibration	= 0x7FFFFFFF;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= osc::_cfg_::_OscType;
+			static const uint32_t							_Clock_Hz		= _pll_cfg::_Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= state;
+			static const int32_t							_Calibration	= ::mcu::clock::CALIBRATION_DEF;
 		
-			static const uint32_t						_pll_prediv		= _pll_cfg::pll_prediv	;
-			static const bool							_usb_div_1_5	= _pll_cfg::usb_div_1_5	;
-			static const uint32_t						_pll_mul		= _pll_cfg::pll_mul		;
-			static const uint32_t						_usb_clock		= _pll_cfg::usb_clock	;
-			static const bool							_usb_active		= _pll_cfg::usb_active	;
+			static const uint32_t							_pll_prediv		= _pll_cfg::pll_prediv	;
+			static const bool								_usb_div_1_5	= _pll_cfg::usb_div_1_5	;
+			static const uint32_t							_pll_mul		= _pll_cfg::pll_mul		;
+			static const uint32_t							_usb_clock		= _pll_cfg::usb_clock	;
+			static const bool								_usb_active		= _pll_cfg::usb_active	;
 		
 			STATIC_ASSERT(_pll_mul >= 2 && _pll_mul <= 16, "The required clock frequency cannot be reached");
 			STATIC_ASSERT(!pll_usb || _usb_active, "PLL cannot find clock frequency for USB");
@@ -902,8 +843,8 @@ namespace clock {
 					, uint32_t ClockMin_Hz, uint32_t ClockMax_Hz, bool maximal
 					, ::mcu::clock::state::state state
 					, bool pll_usb >
-		class pll_cfg< ::mcu::clock::config::high_speed_external_bypass, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
-			: public pll_cfg< ::mcu::clock::config::high_speed_external, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
+		class pll_cfg< ::mcu::clock::osc_type::high_speed_external_bypass, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
+			: public pll_cfg< ::mcu::clock::osc_type::high_speed_external, OSC, ClockMin_Hz, ClockMax_Hz, maximal, state, pll_usb>
 		{
 		};
 	} // namespace config
@@ -969,9 +910,9 @@ namespace clock {
 		protected:
 			typedef ClockSource osc;
 			
-			STATIC_ASSERT(	osc::_cfg_::_OscType == ::mcu::clock::config::high_speed_internal			||
-							osc::_cfg_::_OscType == ::mcu::clock::config::high_speed_external			||
-							osc::_cfg_::_OscType == ::mcu::clock::config::high_speed_external_bypass
+			STATIC_ASSERT(	osc::_cfg_::_OscType == ::mcu::clock::osc_type::high_speed_internal			||
+							osc::_cfg_::_OscType == ::mcu::clock::osc_type::high_speed_external			||
+							osc::_cfg_::_OscType == ::mcu::clock::osc_type::high_speed_external_bypass
 						, "Invalid source type for system clock");
 
 			STATIC_ASSERT(HCLK_Max_Hz			>= limits::min::HCLK	/*&& HCLK_Max_Hz			<= limits::max::HCLK	*/ , "HCLK_Max_Hz			- Invalid parameter");
@@ -983,16 +924,16 @@ namespace clock {
 			STATIC_ASSERT(osc::_cfg_::_Clock_Hz >= limits::min::HCLK && osc::_cfg_::_Clock_Hz <= limits::max::HCLK, "Invalid source for system clock");
 
 		public:
-			static const ::mcu::clock::config::osc_type	_OscType		= osc::_cfg_::_OscType;
-			static const uint32_t						_Clock_Hz		= osc::_cfg_::_Clock_Hz;
-			static const ::mcu::clock::state::state		_State			= osc::_cfg_::_State;
-			static const int32_t						_Calibration	= osc::_cfg_::_Calibration;
+			static const ::mcu::clock::osc_type::osc_type	_OscType		= osc::_cfg_::_OscType;
+			static const uint32_t							_Clock_Hz		= osc::_cfg_::_Clock_Hz;
+			static const ::mcu::clock::state::state			_State			= osc::_cfg_::_State;
+			static const int32_t							_Calibration	= osc::_cfg_::_Calibration;
 		
-			static const uint32_t						_pll_prediv		= osc::_cfg_::_pll_prediv	;
-			static const bool							_usb_div_1_5	= osc::_cfg_::_usb_div_1_5	;
-			static const uint32_t						_pll_mul		= osc::_cfg_::_pll_mul		;
-			static const uint32_t						_usb_clock		= osc::_cfg_::_usb_clock	;
-			static const bool							_usb_active		= osc::_cfg_::_usb_active	;
+			static const uint32_t							_pll_prediv		= osc::_cfg_::_pll_prediv	;
+			static const bool								_usb_div_1_5	= osc::_cfg_::_usb_div_1_5	;
+			static const uint32_t							_pll_mul		= osc::_cfg_::_pll_mul		;
+			static const uint32_t							_usb_clock		= osc::_cfg_::_usb_clock	;
+			static const bool								_usb_active		= osc::_cfg_::_usb_active	;
 		
 			//------------------------------------------------------------------------
 			static const uint32_t	_ahb_div	=
@@ -1100,18 +1041,18 @@ namespace clock {
 			static const uint32_t _flash_acr_latency	= _flash_latency << FLASH_ACR_LATENCY_Pos;
 
 			static const uint32_t _rcc_cfgr_sw =
-				(_pll_mul > 1)													?	RCC_CFGR_SW_PLL :
-				(_OscType == ::mcu::clock::config::high_speed_internal)			?	RCC_CFGR_SW_HSI :
-				(_OscType == ::mcu::clock::config::high_speed_external)			?	RCC_CFGR_SW_HSE :
-				(_OscType == ::mcu::clock::config::high_speed_external_bypass)	?	RCC_CFGR_SW_HSE :
-																					RCC_CFGR_SW_HSI;
+				(_pll_mul > 1)														?	RCC_CFGR_SW_PLL :
+				(_OscType == ::mcu::clock::osc_type::high_speed_internal)			?	RCC_CFGR_SW_HSI :
+				(_OscType == ::mcu::clock::osc_type::high_speed_external)			?	RCC_CFGR_SW_HSE :
+				(_OscType == ::mcu::clock::osc_type::high_speed_external_bypass)	?	RCC_CFGR_SW_HSE :
+																						RCC_CFGR_SW_HSI;
 			
 			static const uint32_t _rcc_cfgr_sws =
-				(_pll_mul > 1)													?	RCC_CFGR_SWS_PLL :
-				(_OscType == ::mcu::clock::config::high_speed_internal)			?	RCC_CFGR_SWS_HSI :
-				(_OscType == ::mcu::clock::config::high_speed_external)			?	RCC_CFGR_SWS_HSE :
-				(_OscType == ::mcu::clock::config::high_speed_external_bypass)	?	RCC_CFGR_SWS_HSE :
-																					RCC_CFGR_SWS_HSI;
+				(_pll_mul > 1)														?	RCC_CFGR_SWS_PLL :
+				(_OscType == ::mcu::clock::osc_type::high_speed_internal)			?	RCC_CFGR_SWS_HSI :
+				(_OscType == ::mcu::clock::osc_type::high_speed_external)			?	RCC_CFGR_SWS_HSE :
+				(_OscType == ::mcu::clock::osc_type::high_speed_external_bypass)	?	RCC_CFGR_SWS_HSE :
+																						RCC_CFGR_SWS_HSI;
 
 			static const uint32_t	_rcc_cfgr_ppre1	=
 				(_apb1_div ==  1) ?	RCC_CFGR_PPRE1_DIV1  :
@@ -1169,7 +1110,7 @@ namespace clock {
 				// 	if(IS_BB_REG_RESET(_RCC_CR_PLLRDY_BB))			// Check the PLL ready
 				// 		return;
 				// }
-				// else if(_OscType == ::mcu::clock::config::high_speed_internal)
+				// else if(_OscType == ::mcu::clock::osc_type::high_speed_internal)
 				// {
 				// 	// HSI is selected as System Clock Source
 				// 	static const uint32_t _RCC_CR_HSIRDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSIRDY_Pos);
@@ -1177,7 +1118,7 @@ namespace clock {
 				// 	if(IS_BB_REG_RESET(_RCC_CR_HSIRDY_BB))			// Check the HSI ready
 				// 		return;
 				// }
-				// else if(_OscType == ::mcu::clock::config::high_speed_external || _OscType == ::mcu::clock::config::high_speed_external_bypass)
+				// else if(_OscType == ::mcu::clock::osc_type::high_speed_external || _OscType == ::mcu::clock::osc_type::high_speed_external_bypass)
 				// {
 				// 	// HSE is selected as System Clock Source
 				// 	static const uint32_t _RCC_CR_HSERDY_BB	= FROM_ADDRESS_BIT_POS_TO_BB(&RCC->CR, RCC_CR_HSERDY_Pos);
@@ -1239,46 +1180,49 @@ namespace clock {
 
 namespace clock {
 
-template < state::state state, int32_t calibration = 0x7FFFFFFF, uint32_t Clock_Hz = HSI_VALUE >
-class osc_hsi : public ::mcu::stm32::clock::osc< config::high_speed_internal, Clock_Hz, state, calibration> {};
+template < state::state state, int32_t calibration, uint32_t Clock_Hz >
+class osc_hsi : public ::mcu::stm32::clock::osc< osc_type::high_speed_internal, Clock_Hz == CLOCK_HZ_DEF ? HSI_VALUE : Clock_Hz, state, calibration> {};
 
-template < state::state state, uint32_t Clock_Hz = LSI_VALUE >
-class osc_lsi : public ::mcu::stm32::clock::osc< config::low_speed_internal, Clock_Hz, state > {};
+template < state::state state, uint32_t Clock_Hz >
+class osc_lsi : public ::mcu::stm32::clock::osc< osc_type::low_speed_internal, Clock_Hz == CLOCK_HZ_DEF ? LSI_VALUE : Clock_Hz, state > {};
 
-template < state::state state, uint32_t Clock_Hz = HSE_VALUE >
-class osc_hse : public ::mcu::stm32::clock::osc< config::high_speed_external, Clock_Hz, state > {};
+template < state::state state, uint32_t Clock_Hz >
+class osc_hse : public ::mcu::stm32::clock::osc< osc_type::high_speed_external, Clock_Hz == CLOCK_HZ_DEF ? HSE_VALUE : Clock_Hz, state > {};
 
-template < state::state state, uint32_t Clock_Hz = HSE_VALUE >
-class osc_hse_bypass : public ::mcu::stm32::clock::osc< config::high_speed_external_bypass, Clock_Hz, state > {};
+template < state::state state, uint32_t Clock_Hz >
+class osc_hse_bypass : public ::mcu::stm32::clock::osc< osc_type::high_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? HSE_VALUE : Clock_Hz, state > {};
 
-template < state::state state, uint32_t Clock_Hz = LSE_VALUE >
-class osc_lse : public ::mcu::stm32::clock::osc< config::low_speed_external, Clock_Hz, state > {};
+template < state::state state, uint32_t Clock_Hz >
+class osc_lse : public ::mcu::stm32::clock::osc< osc_type::low_speed_external, Clock_Hz == CLOCK_HZ_DEF ? LSE_VALUE : Clock_Hz, state > {};
 
-template < state::state state, uint32_t Clock_Hz = LSE_VALUE >
-class osc_lse_bypass : public ::mcu::stm32::clock::osc< config::low_speed_external_bypass, Clock_Hz, state > {};
-
-//////////////////////////////////////////////////////////////////////////	
-typedef osc_hsi			< state::enable > osc_hsi_def;
-typedef osc_lsi			< state::enable > osc_lsi_def;
-typedef osc_hse			< state::enable > osc_hse_def;
-typedef osc_hse_bypass	< state::enable > osc_hse_bypass_def;
-typedef osc_lse			< state::enable > osc_lse_def;
-typedef osc_lse_bypass	< state::enable > osc_lse_bypass_def;
+template < state::state state, uint32_t Clock_Hz >
+class osc_lse_bypass : public ::mcu::stm32::clock::osc< osc_type::low_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? LSE_VALUE : Clock_Hz, state > {};
 
 //////////////////////////////////////////////////////////////////////////	
-typedef ::mcu::stm32::clock::pll_auto_range< osc_hsi_def,			::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, false > pll_hsi_def;
-typedef ::mcu::stm32::clock::pll_auto_range< osc_hse_def,			::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, true  > pll_hse_def;
-typedef ::mcu::stm32::clock::pll_auto_range< osc_hse_bypass_def,	::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, true  > pll_hse_bypass_def;
+template < state::state state > class pll_hsi
+	: public ::mcu::stm32::clock::pll_auto_range< osc_hsi_def, ::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, false, state >
+{};
+
+template < state::state state > class pll_hse
+	: public ::mcu::stm32::clock::pll_auto_range< osc_hse_def, ::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, true, state >
+{};
+
+template < state::state state > class pll_hse_bypass
+	: public ::mcu::stm32::clock::pll_auto_range< osc_hse_bypass_def, ::mcu::stm32::clock::limits::min::SYSCLK, ::mcu::stm32::clock::limits::max::SYSCLK, true, true, state >
+{};
 
 //------------------------------------------------------------------------
 template< class OSC, uint32_t Clock_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
-class pll_auto : public ::mcu::stm32::clock::pll_auto_range< OSC, Clock_Hz, Clock_Hz, true, true, state > {};
+class pll_auto : public ::mcu::stm32::clock::pll_auto_range< OSC, Clock_Hz, Clock_Hz, true, false, state > {};
 
 template< class OSC, uint32_t ClockMin_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, uint32_t ClockMax_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
 class pll_min : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz, ClockMax_Hz, false, false, state > {};
 
 template< class OSC, uint32_t ClockMin_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, uint32_t ClockMax_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
 class pll_max : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz, ClockMax_Hz, true, false, state > {};
+
+template< class OSC, uint32_t Clock_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
+class pll_usb_auto : public ::mcu::stm32::clock::pll_auto_range< OSC, Clock_Hz, Clock_Hz, true, true, state > {};
 
 template< class OSC, uint32_t ClockMin_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, uint32_t ClockMax_Hz = ::mcu::stm32::clock::limits::max::SYSCLK, state::state state = state::enable >
 class pll_usb_min : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz, ClockMax_Hz, false, true, state > {};
@@ -1298,13 +1242,11 @@ template<
 	>
 class sysclock_auto : public ::mcu::stm32::clock::sysclock_auto< ClockSource, HCLK_Max_Hz, APB1CLK_Max_Hz, APB2CLK_Max_Hz, 1000000/*Hz*/ / CortexSysTimer_ms, ADCCLK_Max_Hz > {};
 
-//------------------------------------------------------------------------
-
-typedef sysclock_auto<osc_hsi_def       > sysclock_osc_hsi_def;
-typedef sysclock_auto<osc_hse_def       > sysclock_osc_hse_def;
-typedef sysclock_auto<pll_hsi_def       > sysclock_pll_hsi_def;
-typedef sysclock_auto<pll_hse_def       > sysclock_pll_hse_def;
-typedef sysclock_auto<pll_hse_bypass_def> sysclock_pll_hse_bypass_def;
+template<
+		class		ClockSource,
+		uint32_t	CortexSysTimer_ms
+	>
+class sysclock_max : public sysclock_auto< ClockSource, CortexSysTimer_ms > {};
 
 } // namespace clock
 
