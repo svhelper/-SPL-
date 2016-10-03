@@ -180,26 +180,26 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		mode::mode			Mode      ,
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::mode::mode		Mode      ,
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
 	class REG_GPIO;
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
-	class REG_GPIO<mode::analog, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<gpio::mode::analog, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 		/* If we are configuring the pin in INPUT analog mode */
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -215,14 +215,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
-	class REG_GPIO<mode::input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<gpio::mode::input, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -230,22 +230,22 @@ namespace registers {
 
 	public:
 		static const uint32_t CR = MODE | CNF;
-		static const uint32_t ODR_MASK  = (pull_up_dn << Pin);
-		static const uint32_t ODR       = (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
+		static const uint32_t ODR_MASK  = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (pull_up_dn << Pin);
+		static const uint32_t ODR       = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
 		static const uint32_t ODR_SET   = ODR;
 		static const uint32_t ODR_RESET = ODR;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
-	class REG_GPIO<mode::output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<gpio::mode::output, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 	private:
 		static const uint32_t MODE =
@@ -257,26 +257,26 @@ namespace registers {
 		static const uint32_t CNF = 
 			(Flag == flag::output_push_pull ) ? _const_::GPIO_CR_CNF_GP_OUTPUT_PP : /* If we are configuring the pin in OUTPUT push-pull mode */
 			(Flag == flag::output_open_drain) ? _const_::GPIO_CR_CNF_GP_OUTPUT_OD : /* If we are configuring the pin in OUTPUT open-drain mode */
-												  _const_::GPIO_CR_CNF_GP_OUTPUT_PP;
+												_const_::GPIO_CR_CNF_GP_OUTPUT_PP;
 
 	public:
 		static const uint32_t CR = MODE | CNF;
-		static const uint32_t ODR_MASK  = (0x01UL << Pin);
-		static const uint32_t ODR       = (DefState != state::reset) ? (0x01UL << Pin) : (0x00UL << Pin);
+		static const uint32_t ODR_MASK  = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (0x01UL << Pin);
+		static const uint32_t ODR       = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (DefState != state::reset) ? (0x01UL << Pin) : (0x00UL << Pin);
 		static const uint32_t ODR_SET   = (0x01UL << Pin);	/* Set the corresponding ODR bit */
 		static const uint32_t ODR_RESET = (0x00UL << Pin);	/* Reset the corresponding ODR bit */
 	};
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
-	class REG_GPIO<mode::alt_input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<gpio::mode::alt_input, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -284,22 +284,22 @@ namespace registers {
 
 	public:
 		static const uint32_t CR = MODE | CNF;
-		static const uint32_t ODR_MASK  = (pull_up_dn << Pin);
-		static const uint32_t ODR       = (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
+		static const uint32_t ODR_MASK  = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (pull_up_dn << Pin);
+		static const uint32_t ODR       = (Port == port::inv_address || Pin == port::inv_pin) ? 0 : (Pull == pull::up) ? (0x01UL << Pin) : (0x00UL << Pin);
 		static const uint32_t ODR_SET   = ODR;
 		static const uint32_t ODR_RESET = ODR;
 	};
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		speed::speed		Speed     ,
-		state::state		DefState  ,
-		pull::pull			Pull      ,
-		flag::flag			Flag      ,
-		port::address		Port      ,
-		port::pin			Pin       
+		gpio::speed::speed		Speed     ,
+		gpio::state::state		DefState  ,
+		gpio::pull::pull		Pull      ,
+		gpio::flag::flag		Flag      ,
+		port::address			Port      ,
+		port::pin				Pin       
 		>
-	class REG_GPIO<mode::alt_output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO<gpio::mode::alt_output, Speed, DefState, Pull, Flag, Port, Pin>
 	{
 	private:
 		static const uint32_t MODE =
@@ -323,12 +323,12 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		mode::mode	Mode      ,
-		pin_id::pin_id	PinID
+		gpio::mode::mode		Mode      ,
+		gpio::pin_id::pin_id	PinID
 		> class REG_RCC
 	{
 	public:
-		static const uint32_t APB2ENR_AFIOEN = (Mode == mode::alt_input || Mode == mode::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
+		static const uint32_t APB2ENR_AFIOEN = (Mode == gpio::mode::alt_input || Mode == gpio::mode::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
 		
 		static const uint32_t APB2ENR_MASK = APB2ENR_AFIOEN | (
 			IF_GPIOA_EXISTS((PinID >= pin_id::PA0 && PinID <= pin_id::PA31) ? RCC_APB2ENR_IOPAEN :)
@@ -342,6 +342,24 @@ namespace registers {
 			IF_GPIOI_EXISTS((PinID >= pin_id::PI0 && PinID <= pin_id::PI31) ? RCC_APB2ENR_IOPIEN :)
 			0);
 		static const uint32_t APB2ENR = APB2ENR_MASK;
+	};
+	
+	//////////////////////////////////////////////////////////////////////////
+	template <
+		stm32::port::address PORT,
+		stm32::port::pin     PIN 
+		> class GPIO_REG_TO_BB
+	{
+	public:
+		static const uint32_t _GPIO_ODR_BB = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)(uint32_t)PORT)->ODR), PIN);
+		static const uint32_t _GPIO_IDR_BB = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)(uint32_t)PORT)->IDR), PIN);
+	};
+
+	template <> class GPIO_REG_TO_BB<stm32::port::inv_address, stm32::port::inv_pin>
+	{
+	public:
+		static const uint32_t _GPIO_ODR_BB = 0;
+		static const uint32_t _GPIO_IDR_BB = 0;
 	};
 
 } // namespace registers
@@ -368,11 +386,8 @@ private:
 		static const stm32::port::address PORT   = stm32::port::convert<PinID>::to_address;
 		static const stm32::port::pin     PIN    = stm32::port::convert<PinID>::to_pin;
 		
-		//static const uint32_t _GPIO_ODR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->ODR), PIN);
-		//static const uint32_t _GPIO_IDR_BB      = FROM_ADDRESS_BIT_POS_TO_BB(&(((GPIO_TypeDef*)PORT)->IDR), PIN);
-		
-		static const uint32_t _GPIO_ODR_BB      = PERIPH_BB_BASE + ((uint32_t)PORT - PERIPH_BASE) * 32 + ((uint32_t)&((GPIO_TypeDef*)0)->ODR) * 32 + (PIN) * 4;
-		static const uint32_t _GPIO_IDR_BB      = PERIPH_BB_BASE + ((uint32_t)PORT - PERIPH_BASE) * 32 + ((uint32_t)&((GPIO_TypeDef*)0)->IDR) * 32 + (PIN) * 4;
+		static const uint32_t _GPIO_ODR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_ODR_BB;
+		static const uint32_t _GPIO_IDR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_IDR_BB;
 	};
 	
 protected:
@@ -484,6 +499,7 @@ public:
 	static void update()
 	{
 		// Update ODR (pu/pd for input; state for output)
+		(_cfg_::_PinID == pin_id::invalid) ? (void)(0) :			// (_cfg_::_PinID == pin_id::invalid || _cfg_::_Pin == port::inv_pin) ? (void)(0) :
 		(_cfg_::_odr_mask) ?
 			(
 				(_cfg_::_odr_val) ?
@@ -493,6 +509,7 @@ public:
 			(void)(0);
 
 		// configure port
+		(_cfg_::_PinID == pin_id::invalid) ? (void)(0) :			// (_cfg_::_PinID == pin_id::invalid || _cfg_::_Pin == port::inv_pin) ? (void)(0) :
 		(_cfg_::_Pin < stm32::port::pin_8) ?
 			(void)(MODIFY_REG(((GPIO_TypeDef*)_cfg_::_Port)->CRL,
 						((GPIO_CRL_MODE0 | GPIO_CRL_CNF0) << ((_cfg_::_Pin - 0) << 2)),
@@ -620,11 +637,11 @@ public:
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <class p00, class p01, class p02, class p03, class p04, class p05, class p06, class p07,
-		  class p08, class p09, class p10, class p11, class p12, class p13, class p14, class p15,
-		  class p16, class p17, class p18, class p19, class p20, class p21, class p22, class p23,
-		  class p24, class p25, class p26, class p27, class p28, class p29, class p30, class p31,
-		  class p32, class p33, class p34, class p35, class p36, class p37, class p38, class p39>
+template <typename p00, typename p01, typename p02, typename p03, typename p04, typename p05, typename p06, typename p07,
+		  typename p08, typename p09, typename p10, typename p11, typename p12, typename p13, typename p14, typename p15,
+		  typename p16, typename p17, typename p18, typename p19, typename p20, typename p21, typename p22, typename p23,
+		  typename p24, typename p25, typename p26, typename p27, typename p28, typename p29, typename p30, typename p31,
+		  typename p32, typename p33, typename p34, typename p35, typename p36, typename p37, typename p38, typename p39>
 class atomic
 {
 #define ASSEMBLE_EXP(exp, ...)				__ASSEM_##exp##(p00, __VA_ARGS__) __ASSEM_##exp##(p01, __VA_ARGS__) \

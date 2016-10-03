@@ -237,16 +237,16 @@ class gpio_base;
 class gpio_dummy;
 typedef gpio_dummy gpio_invalid;
 
-template <class p00 = gpio_dummy, class p01 = gpio_dummy, class p02 = gpio_dummy, class p03 = gpio_dummy,
-		  class p04 = gpio_dummy, class p05 = gpio_dummy, class p06 = gpio_dummy, class p07 = gpio_dummy,
-		  class p08 = gpio_dummy, class p09 = gpio_dummy, class p10 = gpio_dummy, class p11 = gpio_dummy,
-		  class p12 = gpio_dummy, class p13 = gpio_dummy, class p14 = gpio_dummy, class p15 = gpio_dummy,
-		  class p16 = gpio_dummy, class p17 = gpio_dummy, class p18 = gpio_dummy, class p19 = gpio_dummy,
-		  class p20 = gpio_dummy, class p21 = gpio_dummy, class p22 = gpio_dummy, class p23 = gpio_dummy,
-		  class p24 = gpio_dummy, class p25 = gpio_dummy, class p26 = gpio_dummy, class p27 = gpio_dummy,
-		  class p28 = gpio_dummy, class p29 = gpio_dummy, class p30 = gpio_dummy, class p31 = gpio_dummy,
-		  class p32 = gpio_dummy, class p33 = gpio_dummy, class p34 = gpio_dummy, class p35 = gpio_dummy,
-		  class p36 = gpio_dummy, class p37 = gpio_dummy, class p38 = gpio_dummy, class p39 = gpio_dummy>
+template <typename p00 = gpio_dummy, typename p01 = gpio_dummy, typename p02 = gpio_dummy, typename p03 = gpio_dummy,
+		  typename p04 = gpio_dummy, typename p05 = gpio_dummy, typename p06 = gpio_dummy, typename p07 = gpio_dummy,
+		  typename p08 = gpio_dummy, typename p09 = gpio_dummy, typename p10 = gpio_dummy, typename p11 = gpio_dummy,
+		  typename p12 = gpio_dummy, typename p13 = gpio_dummy, typename p14 = gpio_dummy, typename p15 = gpio_dummy,
+		  typename p16 = gpio_dummy, typename p17 = gpio_dummy, typename p18 = gpio_dummy, typename p19 = gpio_dummy,
+		  typename p20 = gpio_dummy, typename p21 = gpio_dummy, typename p22 = gpio_dummy, typename p23 = gpio_dummy,
+		  typename p24 = gpio_dummy, typename p25 = gpio_dummy, typename p26 = gpio_dummy, typename p27 = gpio_dummy,
+		  typename p28 = gpio_dummy, typename p29 = gpio_dummy, typename p30 = gpio_dummy, typename p31 = gpio_dummy,
+		  typename p32 = gpio_dummy, typename p33 = gpio_dummy, typename p34 = gpio_dummy, typename p35 = gpio_dummy,
+		  typename p36 = gpio_dummy, typename p37 = gpio_dummy, typename p38 = gpio_dummy, typename p39 = gpio_dummy>
 class atomic;
 
 /************************************************************************/
