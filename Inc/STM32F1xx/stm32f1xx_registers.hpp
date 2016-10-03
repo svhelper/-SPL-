@@ -417,8 +417,8 @@ public:
 #define WRITE_BB_REG(address, value)			(*(__IO uint32_t *)(address) = value)
 #define READ_BB_REG(address)					(*(__IO uint32_t *)(address))
 
-#define SET_BB_REG(address)						WRITE_BB_REG(address, !RESET)
-#define RESET_BB_REG(address)					WRITE_BB_REG(address, RESET)
+#define SET_BB_REG(address)						WRITE_BB_REG((address), !RESET)
+#define RESET_BB_REG(address)					WRITE_BB_REG((address), RESET)
 
 #define IS_BB_REG_SET(address)					(READ_BB_REG(address) != RESET)
 #define IS_BB_REG_RESET(address)				(READ_BB_REG(address) == RESET)

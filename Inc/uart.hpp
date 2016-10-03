@@ -41,6 +41,8 @@ typedef enum
 	uart_14,
 	uart_15,
 	uart_16,
+	
+	invalid			= 0xFFFF,
 } uart_id;
 } // namespace uart_id
 
@@ -64,13 +66,20 @@ typedef enum
 namespace mode {
 typedef enum
 {
-	tx_only,
-	rx_only,
-	tx_rx,
-	sync_tx_only,
-	sync_rx_only,
-	sync_tx_rx,
+	// service values
+	sync_mask		= 1UL << 3,
+	
+	// async mode
+	tx_only			= 1UL << 0,
+	rx_only			= 1UL << 1,
+	tx_rx			= tx_only | rx_only,
+	
+	// sync mode
+	sync_tx_only	= sync_mask | tx_only,
+	sync_rx_only	= sync_mask | rx_only,
+	sync_tx_rx		= sync_mask | tx_only | rx_only,
 
+	// aliases
 	rx_tx			= tx_rx,
 	both			= tx_rx,
 	sync_rx_tx		= sync_tx_rx,
@@ -78,15 +87,41 @@ typedef enum
 } mode;
 } // namespace mode
 
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 namespace flow_control {
 typedef enum
 {
-	none,
-	rts,
-	cts,
-	rts_cts,
+	none			= 0,
+	rts				= 1UL << 0,
+	cts				= 1UL << 1,
+	rts_cts			= rts | cts,
+
+	// aliases
+	cts_rts			= rts_cts,
+	hardware		= rts_cts,
 } flow_control;
 } // namespace flow_control
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+namespace stop_bits {
+typedef enum
+{
+	half,
+	one,
+	one_and_half,
+	two,
+	
+	// aliases
+	_0_5	= half,
+	_1		= one,
+	_1_5	= one_and_half,
+	_2		= two,
+} stop_bits;
+} // namespace stop_bits
 
 /************************************************************************/
 /*                                                                      */
@@ -108,7 +143,24 @@ template <
 			mode::mode					Mode		= mode::tx_rx			,
 			uint32_t					BaudRate	= BAUDRATE_DEF			,
 			uint32_t					DataBits	= 8						,
-			uint32_t					StopBits	= 1						,
+			stop_bits::stop_bits		StopBits	= stop_bits::one		,
+			parity::parity				Parity		= parity::none			,
+			flow_control::flow_control	FlowControl	= flow_control::none	,
+			pin_id::pin_id				TxPinID		= pin_id::invalid		,
+			pin_id::pin_id				RxPinID		= pin_id::invalid		,
+			pin_id::pin_id				RtsPinID	= pin_id::invalid		,
+			pin_id::pin_id				CtsPinID	= pin_id::invalid		,
+			pin_id::pin_id				CkPinID		= pin_id::invalid		,
+			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
+		>
+class uart_base;
+
+template <
+			uart_id::uart_id			UartID								,
+			mode::mode					Mode		= mode::tx_rx			,
+			uint32_t					BaudRate	= BAUDRATE_DEF			,
+			uint32_t					DataBits	= 8						,
+			stop_bits::stop_bits		StopBits	= stop_bits::one		,
 			parity::parity				Parity		= parity::none			,
 			flow_control::flow_control	FlowControl	= flow_control::none	,
 			class						PinTx		= gpio_invalid			,
@@ -118,7 +170,36 @@ template <
 			class						PinCk		= gpio_invalid			,
 			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
 		>
-class uart_base;
+class uart_gpio : public uart_base<
+			UartID					,
+			Mode					,
+			BaudRate				,
+			DataBits				,
+			StopBits				,
+			Parity					,
+			FlowControl				,
+			PinTx::_cfg_::_PinID	,
+			PinRx::_cfg_::_PinID	,
+			PinRts::_cfg_::_PinID	,
+			PinCts::_cfg_::_PinID	,
+			PinCk::_cfg_::_PinID	,
+			BaudRateAccuracyMax
+	>
+{};
+
+template <
+			uart_id::uart_id			UartID								,
+			mode::mode					Mode		= mode::tx_rx			,
+			uint32_t					BaudRate	= BAUDRATE_DEF			,
+			uint32_t					DataBits	= 8						,
+			stop_bits::stop_bits		StopBits	= stop_bits::one		,
+			parity::parity				Parity		= parity::none			,
+			flow_control::flow_control	FlowControl	= flow_control::none	,
+			uint32_t					AltFuncId	= 0						,
+			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
+		>
+class uart_def;
+
 
 /************************************************************************/
 /*                                                                      */
