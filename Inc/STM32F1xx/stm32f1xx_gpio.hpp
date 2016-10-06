@@ -13,8 +13,8 @@
 #include <gpio.hpp>
 
 //////////////////////////////////////////////////////////////////////////
-#include <stm32f1xx.h>
-#include <stm32f1xx_registers.hpp>
+#include "CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
+#include "stm32f1xx/stm32f1xx_registers.hpp"
 
 
 /************************************************************************/
@@ -180,26 +180,26 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::mode::mode		Mode      ,
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::mode::mode		Mode      ,
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
 	class REG_GPIO;
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
-	class REG_GPIO<gpio::mode::analog, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO< ::mcu::gpio::mode::analog, Speed, DefState, Pull, Flag, Port, Pin >
 	{
 		/* If we are configuring the pin in INPUT analog mode */
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -215,14 +215,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
-	class REG_GPIO<gpio::mode::input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO< ::mcu::gpio::mode::input, Speed, DefState, Pull, Flag, Port, Pin >
 	{
 		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -238,14 +238,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
-	class REG_GPIO<gpio::mode::output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO< ::mcu::gpio::mode::output, Speed, DefState, Pull, Flag, Port, Pin >
 	{
 	private:
 		static const uint32_t MODE =
@@ -269,14 +269,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
-	class REG_GPIO<gpio::mode::alt_input, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO< ::mcu::gpio::mode::alt_input, Speed, DefState, Pull, Flag, Port, Pin >
 	{
 		static const uint32_t pull_up_dn = ((Pull == pull::up) || (Pull == pull::down)) ? 0x01UL : 0x00UL;
 		static const uint32_t MODE = _const_::GPIO_CR_MODE_INPUT;
@@ -292,14 +292,14 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::speed::speed		Speed     ,
-		gpio::state::state		DefState  ,
-		gpio::pull::pull		Pull      ,
-		gpio::flag::flag		Flag      ,
-		port::address			Port      ,
-		port::pin				Pin       
+		::mcu::gpio::speed::speed	Speed     ,
+		::mcu::gpio::state::state	DefState  ,
+		::mcu::gpio::pull::pull		Pull      ,
+		::mcu::gpio::flag::flag		Flag      ,
+		port::address				Port      ,
+		port::pin					Pin       
 		>
-	class REG_GPIO<gpio::mode::alt_output, Speed, DefState, Pull, Flag, Port, Pin>
+	class REG_GPIO< ::mcu::gpio::mode::alt_output, Speed, DefState, Pull, Flag, Port, Pin >
 	{
 	private:
 		static const uint32_t MODE =
@@ -323,12 +323,12 @@ namespace registers {
 	
 	//////////////////////////////////////////////////////////////////////////
 	template <
-		gpio::mode::mode		Mode      ,
-		gpio::pin_id::pin_id	PinID
+		::mcu::gpio::mode::mode		Mode      ,
+		::mcu::gpio::pin_id::pin_id	PinID
 		> class REG_RCC
 	{
 	public:
-		static const uint32_t APB2ENR_AFIOEN = (Mode == gpio::mode::alt_input || Mode == gpio::mode::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
+		static const uint32_t APB2ENR_AFIOEN = (Mode == ::mcu::gpio::mode::alt_input || Mode == ::mcu::gpio::mode::alt_output) ? RCC_APB2ENR_AFIOEN : 0;
 		
 		static const uint32_t APB2ENR_MASK = APB2ENR_AFIOEN | (
 			IF_GPIOA_EXISTS((PinID >= pin_id::PA0 && PinID <= pin_id::PA31) ? RCC_APB2ENR_IOPAEN :)
@@ -369,43 +369,37 @@ namespace registers {
 /*                                                                      */
 /************************************************************************/
 namespace gpio {
-template <	pin_id::pin_id		PinID     ,
-			mode::mode			Mode      ,
-			speed::speed		Speed     ,
-			state::state		DefState  ,
-			pull::pull			Pull      ,
-			flag::flag			Flag      
-		>
-class gpio_base
+template < class _CFG_ >
+class gpio : public obj::obj< objtype::gpio, _CFG_::_PinID >
 {
 private:
 	class _const_
 	{
-		friend class gpio_base;
+		friend class gpio;
 		
-		static const stm32::port::address PORT   = stm32::port::convert<PinID>::to_address;
-		static const stm32::port::pin     PIN    = stm32::port::convert<PinID>::to_pin;
+		static const stm32::port::address PORT   = stm32::port::convert<_CFG_::_PinID>::to_address;
+		static const stm32::port::pin     PIN    = stm32::port::convert<_CFG_::_PinID>::to_pin;
 		
 		static const uint32_t _GPIO_ODR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_ODR_BB;
 		static const uint32_t _GPIO_IDR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_IDR_BB;
 	};
 	
 protected:
-	gpio_base();
-	~gpio_base();
+	gpio();
+	~gpio();
 
 public:
 	class _cfg_
 	{
 	public:
-		static const pin_id::pin_id			_PinID			= PinID;
+		static const pin_id::pin_id			_PinID			= _CFG_::_PinID;
 		static const stm32::port::address	_Port			= _const_::PORT;
 		static const stm32::port::pin		_Pin			= _const_::PIN;
-		static const mode::mode				_Mode			= Mode;
-		static const speed::speed			_Speed			= Speed;
-		static const state::state			_DefPinState	= DefState;
-		static const pull::pull				_Pull			= Pull;
-		static const flag::flag				_Flag			= Flag;
+		static const mode::mode				_Mode			= _CFG_::_Mode;
+		static const speed::speed			_Speed			= _CFG_::_Speed;
+		static const state::state			_DefPinState	= _CFG_::_DefState;
+		static const pull::pull				_Pull			= _CFG_::_Pull;
+		static const flag::flag				_Flag			= _CFG_::_Flag;
 
 	private:
 		STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
@@ -552,62 +546,20 @@ public:
 	}
 	
 	template <state::state NewState>
-	class _write_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, NewState    , _cfg_::_Pull, _cfg_::_Flag>
+	class _write_ : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, NewState    , _cfg_::_Pull, _cfg_::_Flag> >
 	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 	
-	class _set_   : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::set  , _cfg_::_Pull, _cfg_::_Flag>
+	class _set_   : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::set  , _cfg_::_Pull, _cfg_::_Flag> >
 	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 	
-	class _reset_ : public gpio_base<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::reset, _cfg_::_Pull, _cfg_::_Flag>
+	class _reset_ : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::reset, _cfg_::_Pull, _cfg_::_Flag> >
 	{ STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode"); };
 };
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <	pin_id::pin_id		PinID
-		>
-class analog : public gpio_base<PinID, mode::analog, speed::low, state::reset, pull::no, flag::flag_no> { };
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template <	pin_id::pin_id		PinID,
-			pull::pull			Pull      = pull::no
-		>
-class input : public gpio_base<PinID, mode::input, speed::low, state::reset, Pull, flag::flag_no> { };
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template <	pin_id::pin_id		PinID,
-			state::state		DefState  = state::reset,
-			speed::speed		Speed     = speed::low,
-			bool				OpenDrain = false
-		>
-class output : public gpio_base<PinID, mode::output, Speed, DefState, pull::no, OpenDrain ? flag::output_open_drain : flag::output_push_pull> { };
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template <	pin_id::pin_id		PinID,
-			pull::pull			Pull      = pull::no
-		>
-class alt_input : public gpio_base<PinID, mode::alt_input, speed::low, state::reset, Pull, flag::flag_no> { };
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template <	pin_id::pin_id		PinID,
-			speed::speed		Speed     = speed::low,
-			bool				OpenDrain = false
-		>
-class alt_output : public gpio_base<PinID, mode::alt_output, Speed, state::reset, pull::no, OpenDrain ? flag::alt_output_open_drain : flag::alt_output_push_pull> { };
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-class gpio_dummy
+class gpio_dummy : public ::mcu::dummy::obj
 {
 public:
 	class _cfg_
@@ -637,51 +589,26 @@ public:
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-template <typename p00, typename p01, typename p02, typename p03, typename p04, typename p05, typename p06, typename p07,
-		  typename p08, typename p09, typename p10, typename p11, typename p12, typename p13, typename p14, typename p15,
-		  typename p16, typename p17, typename p18, typename p19, typename p20, typename p21, typename p22, typename p23,
-		  typename p24, typename p25, typename p26, typename p27, typename p28, typename p29, typename p30, typename p31,
-		  typename p32, typename p33, typename p34, typename p35, typename p36, typename p37, typename p38, typename p39>
+template < _VAR_ARGS_DEF() >
 class atomic
 {
-#define ASSEMBLE_EXP(exp, ...)				__ASSEM_##exp##(p00, __VA_ARGS__) __ASSEM_##exp##(p01, __VA_ARGS__) \
-											__ASSEM_##exp##(p02, __VA_ARGS__) __ASSEM_##exp##(p03, __VA_ARGS__) \
-											__ASSEM_##exp##(p04, __VA_ARGS__) __ASSEM_##exp##(p05, __VA_ARGS__) \
-											__ASSEM_##exp##(p06, __VA_ARGS__) __ASSEM_##exp##(p07, __VA_ARGS__) \
-											__ASSEM_##exp##(p08, __VA_ARGS__) __ASSEM_##exp##(p09, __VA_ARGS__) \
-											__ASSEM_##exp##(p10, __VA_ARGS__) __ASSEM_##exp##(p11, __VA_ARGS__) \
-											__ASSEM_##exp##(p12, __VA_ARGS__) __ASSEM_##exp##(p13, __VA_ARGS__) \
-											__ASSEM_##exp##(p14, __VA_ARGS__) __ASSEM_##exp##(p15, __VA_ARGS__) \
-											__ASSEM_##exp##(p16, __VA_ARGS__) __ASSEM_##exp##(p17, __VA_ARGS__) \
-											__ASSEM_##exp##(p18, __VA_ARGS__) __ASSEM_##exp##(p19, __VA_ARGS__) \
-											__ASSEM_##exp##(p20, __VA_ARGS__) __ASSEM_##exp##(p21, __VA_ARGS__) \
-											__ASSEM_##exp##(p22, __VA_ARGS__) __ASSEM_##exp##(p23, __VA_ARGS__) \
-											__ASSEM_##exp##(p24, __VA_ARGS__) __ASSEM_##exp##(p25, __VA_ARGS__) \
-											__ASSEM_##exp##(p26, __VA_ARGS__) __ASSEM_##exp##(p27, __VA_ARGS__) \
-											__ASSEM_##exp##(p28, __VA_ARGS__) __ASSEM_##exp##(p29, __VA_ARGS__) \
-											__ASSEM_##exp##(p30, __VA_ARGS__) __ASSEM_##exp##(p31, __VA_ARGS__) \
-											__ASSEM_##exp##(p32, __VA_ARGS__) __ASSEM_##exp##(p33, __VA_ARGS__) \
-											__ASSEM_##exp##(p34, __VA_ARGS__) __ASSEM_##exp##(p35, __VA_ARGS__) \
-											__ASSEM_##exp##(p36, __VA_ARGS__) __ASSEM_##exp##(p37, __VA_ARGS__) \
-											__ASSEM_##exp##(p38, __VA_ARGS__) __ASSEM_##exp##(p39, __VA_ARGS__) \
+#	define __VAR_ARGS_ALL(IND, MEMBER)		(p##IND::MEMBER) |
+#define ASSEMBLE_ALL(MEMBER)				(__VAR_ARGS__(ALL, MEMBER) 0)
 
-#	define __ASSEM_ALL(type, member)		(type::member) |
-#define ASSEMBLE_ALL(member)				(ASSEMBLE_EXP(ALL, member) 0)
-
-#	define __ASSEM_IF(type, port, member)	(port == type::_cfg_::_Port ? type::member : 0) |
-#define ASSEMBLE_IF(port, member)			(ASSEMBLE_EXP(IF, port, member) 0)
+#	define __VAR_ARGS_IF(IND, PORT, MEMBER)	(PORT == p##IND::_cfg_::_Port ? p##IND::MEMBER : 0) |
+#define ASSEMBLE_IF(PORT, MEMBER)			(__VAR_ARGS__(IF, PORT, MEMBER) 0)
 	
-#	define __ASSEM_CRL_MASK(type, p)		((p == type::_cfg_::_Port && type::_cfg_::_Pin < stm32::port::pin_8) ? ((GPIO_CRL_MODE0 | GPIO_CRL_CNF0) << ((type::_cfg_::_Pin - 0) << 2)) : 0) |
-#define ASSEMBLE_CRL_MASK(port)				(ASSEMBLE_EXP(CRL_MASK, port) 0)
+#	define __VAR_ARGS_CRL_MASK(IND, PORT)	((PORT == p##IND::_cfg_::_Port && p##IND::_cfg_::_Pin < stm32::port::pin_8) ? ((GPIO_CRL_MODE0 | GPIO_CRL_CNF0) << ((p##IND::_cfg_::_Pin - 0) << 2)) : 0) |
+#define ASSEMBLE_CRL_MASK(PORT)				(__VAR_ARGS__(CRL_MASK, PORT) 0)
 
-#	define __ASSEM_CRL(type, p)				((p == type::_cfg_::_Port && type::_cfg_::_Pin < stm32::port::pin_8) ? (type::_cfg_::_cr << ((type::_cfg_::_Pin - 0) << 2)) : 0) |
-#define ASSEMBLE_CRL(port)					(ASSEMBLE_EXP(CRL, port) 0)
+#	define __VAR_ARGS_CRL(IND, PORT)		((PORT == p##IND::_cfg_::_Port && p##IND::_cfg_::_Pin < stm32::port::pin_8) ? (p##IND::_cfg_::_cr << ((p##IND::_cfg_::_Pin - 0) << 2)) : 0) |
+#define ASSEMBLE_CRL(PORT)					(__VAR_ARGS__(CRL, PORT) 0)
 
-#	define __ASSEM_CRH_MASK(type, p)		((p == type::_cfg_::_Port && type::_cfg_::_Pin >= stm32::port::pin_8) ? ((GPIO_CRH_MODE8 | GPIO_CRH_CNF8) << ((type::_cfg_::_Pin - 8) << 2)) : 0) |
-#define ASSEMBLE_CRH_MASK(port)				(ASSEMBLE_EXP(CRH_MASK, port) 0)
+#	define __VAR_ARGS_CRH_MASK(IND, PORT)	((PORT == p##IND::_cfg_::_Port && p##IND::_cfg_::_Pin >= stm32::port::pin_8) ? ((GPIO_CRH_MODE8 | GPIO_CRH_CNF8) << ((p##IND::_cfg_::_Pin - 8) << 2)) : 0) |
+#define ASSEMBLE_CRH_MASK(PORT)				(__VAR_ARGS__(CRH_MASK, PORT) 0)
 
-#	define __ASSEM_CRH(type, p)				((p == type::_cfg_::_Port && type::_cfg_::_Pin >= stm32::port::pin_8) ? (type::_cfg_::_cr << ((type::_cfg_::_Pin - 8) << 2)) : 0) |
-#define ASSEMBLE_CRH(port)					(ASSEMBLE_EXP(CRH, port) 0)
+#	define __VAR_ARGS_CRH(IND, PORT)		((PORT == p##IND::_cfg_::_Port && p##IND::_cfg_::_Pin >= stm32::port::pin_8) ? (p##IND::_cfg_::_cr << ((p##IND::_cfg_::_Pin - 8) << 2)) : 0) |
+#define ASSEMBLE_CRH(PORT)					(__VAR_ARGS__(CRH, PORT) 0)
 
 public:
 	static void init()
