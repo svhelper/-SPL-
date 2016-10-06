@@ -40,7 +40,7 @@
   - ADC_CAL[]    - ADC[] + self_calibration
   - SPI_TARGET[] - GPIO[] | SPI[]
   - I2C_TARGET[] - I2C[] + ADDR_ID
-  - LCD_CFG[]    - GPIO[] | SPI_TARGET[] | I2C_TARGET[]
+  - LCD_CMD[]    - GPIO[] | SPI_TARGET[] | I2C_TARGET[]
   - LCD_DATA[]   - GPIO[] | SPI_TARGET[] | I2C_TARGET[]
   - BTN_ARR[]    - GPIO[] | SPI_TARGET[] | I2C_TARGET[]
   - SDCARD[]     - GPIO[] | SDIO[]
@@ -50,7 +50,7 @@
   - USB-HOST[]   - GPIO[] | USB[]
   - USB-OTG[]    - GPIO[] | USB[]
   - CAN-OPEN[]   - GPIO[] | CAN[]
-  - MSC[]        - USB-HOST[] + usb-pipe[]
+  - USBH_MSC[]   - USB-HOST[] + usb-pipe[] | USB-OTG[] + usb-pipe[]
   - etc
 
 - High Level

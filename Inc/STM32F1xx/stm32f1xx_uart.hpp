@@ -15,9 +15,9 @@
 #include <uart.hpp>
 
 //////////////////////////////////////////////////////////////////////////
-#include <stm32f1xx.h>
-#include <stm32f1xx_registers.hpp>
-#include <stm32f1xx_gpio.hpp>
+#include "CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
+#include "stm32f1xx/stm32f1xx_registers.hpp"
+#include "stm32f1xx/stm32f1xx_gpio.hpp"
 
 
 /************************************************************************/
@@ -35,7 +35,7 @@ namespace uart {
 			::mcu::uart::uart_id::uart_id			UartID		,
 			::mcu::uart::mode::mode					Mode		,
 			uint32_t								BaudRate	,
-			uint32_t								DataBits	,
+			::mcu::uart::data_bits::data_bits		DataBits	,
 			::mcu::uart::stop_bits::stop_bits		StopBits	,
 			::mcu::uart::parity::parity				Parity		,
 			::mcu::uart::flow_control::flow_control	FlowControl	,
@@ -49,7 +49,7 @@ namespace uart {
 	class uart_set;
 	
 #define _DEF_USART_CHKMODE(UartID, ALT_CFG_ID, MODE, FLOW_CTL, CkPinID, TxPinID, RxPinID, RtsPinID, CtsPinID, DmaID, DmaChTX, DmaChRX)		\
-	template <uint32_t BaudRate, uint32_t DataBits, stop_bits::stop_bits StopBits, parity::parity Parity, uint32_t BaudRateAccuracyMax> \
+	template <uint32_t BaudRate, data_bits::data_bits DataBits, stop_bits::stop_bits StopBits, parity::parity Parity, uint32_t BaudRateAccuracyMax> \
 	class uart_set< ::mcu::uart::uart_id::UartID, ::mcu::uart::mode::MODE, \
 		BaudRate, DataBits, StopBits, Parity, \
 		::mcu::uart::flow_control::FLOW_CTL, ::mcu::gpio::pin_id::CkPinID, \
@@ -114,11 +114,11 @@ DEFINE_UARTS(CHKMODE)
 	public:
 		static const uart::uart_id::uart_id	_UartID			= UartID				;
 		static const uint32_t				_alt_cfg_id		= AfID					;
-		static const gpio::pin_id::pin_id	_CkPinID		= gpio::pin_id::invalid	;
-		static const gpio::pin_id::pin_id	_TxPinID		= gpio::pin_id::invalid	;
-		static const gpio::pin_id::pin_id	_RxPinID		= gpio::pin_id::invalid	;
-		static const gpio::pin_id::pin_id	_RtsPinID		= gpio::pin_id::invalid	;
-		static const gpio::pin_id::pin_id	_CtsPinID		= gpio::pin_id::invalid	;
+		static const ::mcu::gpio::pin_id::pin_id	_CkPinID		= ::mcu::gpio::pin_id::invalid	;
+		static const ::mcu::gpio::pin_id::pin_id	_TxPinID		= ::mcu::gpio::pin_id::invalid	;
+		static const ::mcu::gpio::pin_id::pin_id	_RxPinID		= ::mcu::gpio::pin_id::invalid	;
+		static const ::mcu::gpio::pin_id::pin_id	_RtsPinID		= ::mcu::gpio::pin_id::invalid	;
+		static const ::mcu::gpio::pin_id::pin_id	_CtsPinID		= ::mcu::gpio::pin_id::invalid	;
 		static const dma::dma_id::dma_id	_dma_id      	= dma::dma_id::invalid	;
 		static const dma::channel::channel	_dma_ch_tx  	= dma::channel::invalid	;
 		static const dma::channel::channel	_dma_ch_rx  	= dma::channel::invalid	;
@@ -134,11 +134,11 @@ DEFINE_UARTS(CHKMODE)
 	public: \
 		static const uart::uart_id::uart_id	_UartID			= uart::uart_id::UartID		; \
 		static const uint32_t				_alt_cfg_id		= ALT_CFG_ID				; \
-		static const gpio::pin_id::pin_id	_CkPinID		= (Mode        & ::mcu::uart::mode::sync_mask	) ? gpio::pin_id::CkPinID	: gpio::pin_id::invalid	; \
-		static const gpio::pin_id::pin_id	_TxPinID		= (Mode        & ::mcu::uart::mode::tx_only		) ? gpio::pin_id::TxPinID	: gpio::pin_id::invalid	; \
-		static const gpio::pin_id::pin_id	_RxPinID		= (Mode        & ::mcu::uart::mode::rx_only		) ? gpio::pin_id::RxPinID	: gpio::pin_id::invalid	; \
-		static const gpio::pin_id::pin_id	_RtsPinID		= (FlowControl & ::mcu::uart::flow_control::rts	) ? gpio::pin_id::RtsPinID	: gpio::pin_id::invalid	; \
-		static const gpio::pin_id::pin_id	_CtsPinID		= (FlowControl & ::mcu::uart::flow_control::cts	) ? gpio::pin_id::CtsPinID	: gpio::pin_id::invalid	; \
+		static const ::mcu::gpio::pin_id::pin_id	_CkPinID		= (Mode        & ::mcu::uart::mode::sync_mask	) ? ::mcu::gpio::pin_id::CkPinID	: ::mcu::gpio::pin_id::invalid	; \
+		static const ::mcu::gpio::pin_id::pin_id	_TxPinID		= (Mode        & ::mcu::uart::mode::tx_only		) ? ::mcu::gpio::pin_id::TxPinID	: ::mcu::gpio::pin_id::invalid	; \
+		static const ::mcu::gpio::pin_id::pin_id	_RxPinID		= (Mode        & ::mcu::uart::mode::rx_only		) ? ::mcu::gpio::pin_id::RxPinID	: ::mcu::gpio::pin_id::invalid	; \
+		static const ::mcu::gpio::pin_id::pin_id	_RtsPinID		= (FlowControl & ::mcu::uart::flow_control::rts	) ? ::mcu::gpio::pin_id::RtsPinID	: ::mcu::gpio::pin_id::invalid	; \
+		static const ::mcu::gpio::pin_id::pin_id	_CtsPinID		= (FlowControl & ::mcu::uart::flow_control::cts	) ? ::mcu::gpio::pin_id::CtsPinID	: ::mcu::gpio::pin_id::invalid	; \
 		static const dma::dma_id::dma_id	_dma_id        	= dma::dma_id::DmaID		; \
 		static const dma::channel::channel	_dma_ch_tx  	= dma::channel::DmaChTX		; \
 		static const dma::channel::channel	_dma_ch_rx  	= dma::channel::DmaChRX		; \
@@ -244,7 +244,7 @@ template <
 			uart_id::uart_id			UartID			,
 			mode::mode					Mode			,
 			uint32_t					BaudRate		,
-			uint32_t					DataBits		,
+			data_bits::data_bits		DataBits		,
 			stop_bits::stop_bits		StopBits		,
 			parity::parity				Parity			,
 			flow_control::flow_control	FlowControl		,
@@ -255,7 +255,7 @@ template <
 			pin_id::pin_id				CkPinID			,
 			uint32_t					BaudRateAccuracyMax
 		>
-class uart_base
+class uart_base : public obj::obj< objtype::uart, UartID >
 {
 private:
 	
@@ -277,13 +277,13 @@ public:
 		static const uart_id::uart_id			_UartID			= UartID		;
 		static const mode::mode					_Mode			= Mode			;
 		static const uint32_t					_BaudRate		= BaudRate		;
-		static const uint32_t					_DataBits		= DataBits		;
+		static const data_bits::data_bits		_DataBits		= DataBits		;
 		static const stop_bits::stop_bits		_StopBits		= StopBits		;
 		static const parity::parity				_Parity			= Parity		;
 		static const flow_control::flow_control	_FlowControl	= FlowControl	;
 		
 		static const uint32_t					_alt_cfg_id		= _set_::_alt_cfg_id;
-		typedef      alt_output<TxPinID >		_PinTx							;
+		typedef      ::mcu::gpio::gpio< ::mcu::gpio::config::alt_output<TxPinID > >		_PinTx							;
 		typedef      alt_input <RxPinID >		_PinRx							;
 		typedef      alt_output<RtsPinID>		_PinRts							;
 		typedef      alt_input <CtsPinID>		_PinCts							;
@@ -304,8 +304,8 @@ public:
 		
 		static const uint32_t _USART_CR1				=
 			( USART_CR1_UE ) |
-			(	(_Parity == parity::none && _DataBits == 9) ? (USART_CR1_M) :
-				(_Parity != parity::none && _DataBits == 8) ? (USART_CR1_M) :
+			(	(_Parity == parity::none && _DataBits == data_bits::_9) ? (USART_CR1_M) :
+				(_Parity != parity::none && _DataBits == data_bits::_8) ? (USART_CR1_M) :
 				(0) ) |
 			//( USART_CR1_WAKE ) |
 			( (_Parity == parity::odd) ? (USART_CR1_PS) : (0) ) |
@@ -438,7 +438,7 @@ public:
 		__NOP();
 		
 		// Enable GPIO
-		gpio::atomic<
+		::mcu::gpio::atomic<
 			typename _cfg_::_PinTx, typename _cfg_::_PinRx,
 			typename _cfg_::_PinRts, typename _cfg_::_PinCts,
 			typename _cfg_::_PinCk
@@ -475,7 +475,7 @@ template <
 			uart_id::uart_id			UartID			,
 			mode::mode					Mode			,
 			uint32_t					BaudRate		,
-			uint32_t					DataBits		,
+			data_bits::data_bits		DataBits		,
 			stop_bits::stop_bits		StopBits		,
 			parity::parity				Parity			,
 			flow_control::flow_control	FlowControl		,

@@ -156,7 +156,66 @@ typedef enum
 /************************************************************************/
 namespace config {
 
-	//////////////////////////////////////////////////////////////////////////
+	template <	pin_id::pin_id	PinID     = pin_id::invalid,
+				mode::mode		Mode      = mode::analog,
+				speed::speed	Speed     = speed::low,
+				state::state	DefState  = state::reset,
+				pull::pull		Pull      = pull::no,
+				flag::flag		Flag      = flag::flag_no
+			>
+	class config
+	{
+	public:
+		static const pin_id::pin_id	_PinID     = PinID   ;
+		static const mode::mode		_Mode      = Mode    ;
+		static const speed::speed	_Speed     = Speed   ;
+		static const state::state	_DefState  = DefState;
+		static const pull::pull		_Pull      = Pull    ;
+		static const flag::flag		_Flag      = Flag    ;
+	};
+
+	template <	pin_id::pin_id		PinID
+			>
+	class analog : public config<PinID, mode::analog, speed::low, state::reset, pull::no, flag::flag_no> { };
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+	template <	pin_id::pin_id		PinID,
+				pull::pull			Pull      = pull::no
+			>
+	class input : public config<PinID, mode::input, speed::low, state::reset, Pull, flag::flag_no> { };
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+	template <	pin_id::pin_id		PinID,
+				state::state		DefState  = state::reset,
+				speed::speed		Speed     = speed::low,
+				bool				OpenDrain = false
+			>
+	class output : public config<PinID, mode::output, Speed, DefState, pull::no, OpenDrain ? flag::output_open_drain : flag::output_push_pull> { };
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+	template <	pin_id::pin_id		PinID,
+				pull::pull			Pull      = pull::no
+			>
+	class alt_input : public config<PinID, mode::alt_input, speed::low, state::reset, Pull, flag::flag_no> { };
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+	template <	pin_id::pin_id		PinID,
+				speed::speed		Speed     = speed::low,
+				bool				OpenDrain = false
+			>
+	class alt_output : public config<PinID, mode::alt_output, Speed, state::reset, pull::no, OpenDrain ? flag::alt_output_open_drain : flag::alt_output_push_pull> { };
+
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
 	template <
 		mode::mode		Mode      ,
 		speed::speed	Speed     ,
@@ -222,14 +281,50 @@ namespace config {
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/	
-template <	pin_id::pin_id	Pin       = pin_id::invalid,
-			mode::mode		Mode      = mode::analog,
-			speed::speed	Speed     = speed::low,
-			state::state	DefState  = state::reset,
-			pull::pull		Pull      = pull::no,
-			flag::flag		Flag      = flag::flag_no
+template < class _CFG_ >
+class gpio;
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+template <	pin_id::pin_id		PinID
 		>
-class gpio_base;
+class analog : public gpio< config::analog<PinID> > { };
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+template <	pin_id::pin_id		PinID,
+			pull::pull			Pull      = pull::no
+		>
+class input : public gpio< config::input<PinID, Pull> > { };
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+template <	pin_id::pin_id		PinID,
+			state::state		DefState  = state::reset,
+			speed::speed		Speed     = speed::low,
+			bool				OpenDrain = false
+		>
+class output : public gpio< config::output<PinID, DefState, Speed, OpenDrain> > { };
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+template <	pin_id::pin_id		PinID,
+			pull::pull			Pull      = pull::no
+		>
+class alt_input : public gpio< config::alt_input<PinID, Pull> > { };
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+template <	pin_id::pin_id		PinID,
+			speed::speed		Speed     = speed::low,
+			bool				OpenDrain = false
+		>
+class alt_output : public gpio< config::alt_output<PinID, Speed, OpenDrain> > { };
 
 /************************************************************************/
 /*                                                                      */
@@ -237,16 +332,7 @@ class gpio_base;
 class gpio_dummy;
 typedef gpio_dummy gpio_invalid;
 
-template <typename p00 = gpio_dummy, typename p01 = gpio_dummy, typename p02 = gpio_dummy, typename p03 = gpio_dummy,
-		  typename p04 = gpio_dummy, typename p05 = gpio_dummy, typename p06 = gpio_dummy, typename p07 = gpio_dummy,
-		  typename p08 = gpio_dummy, typename p09 = gpio_dummy, typename p10 = gpio_dummy, typename p11 = gpio_dummy,
-		  typename p12 = gpio_dummy, typename p13 = gpio_dummy, typename p14 = gpio_dummy, typename p15 = gpio_dummy,
-		  typename p16 = gpio_dummy, typename p17 = gpio_dummy, typename p18 = gpio_dummy, typename p19 = gpio_dummy,
-		  typename p20 = gpio_dummy, typename p21 = gpio_dummy, typename p22 = gpio_dummy, typename p23 = gpio_dummy,
-		  typename p24 = gpio_dummy, typename p25 = gpio_dummy, typename p26 = gpio_dummy, typename p27 = gpio_dummy,
-		  typename p28 = gpio_dummy, typename p29 = gpio_dummy, typename p30 = gpio_dummy, typename p31 = gpio_dummy,
-		  typename p32 = gpio_dummy, typename p33 = gpio_dummy, typename p34 = gpio_dummy, typename p35 = gpio_dummy,
-		  typename p36 = gpio_dummy, typename p37 = gpio_dummy, typename p38 = gpio_dummy, typename p39 = gpio_dummy>
+template < _VAR_ARGS_DEF( = gpio_dummy) >
 class atomic;
 
 /************************************************************************/
