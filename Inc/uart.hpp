@@ -107,6 +107,29 @@ typedef enum
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
+namespace data_bits {
+typedef enum
+{
+	four	= 4,
+	five	= 5,
+	six		= 6,
+	seven	= 7,
+	eight	= 8,
+	nine	= 9,
+	
+	// aliases
+	_4		= four,
+	_5		= five,
+	_6		= six,
+	_7		= seven,
+	_8		= eight,
+	_9		= nine,
+} data_bits;
+} // namespace data_bits
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 namespace stop_bits {
 typedef enum
 {
@@ -142,7 +165,7 @@ template <
 			uart_id::uart_id			UartID								,
 			mode::mode					Mode		= mode::tx_rx			,
 			uint32_t					BaudRate	= BAUDRATE_DEF			,
-			uint32_t					DataBits	= 8						,
+			data_bits::data_bits		DataBits	= data_bits::eight		,
 			stop_bits::stop_bits		StopBits	= stop_bits::one		,
 			parity::parity				Parity		= parity::none			,
 			flow_control::flow_control	FlowControl	= flow_control::none	,
@@ -159,7 +182,7 @@ template <
 			uart_id::uart_id			UartID								,
 			mode::mode					Mode		= mode::tx_rx			,
 			uint32_t					BaudRate	= BAUDRATE_DEF			,
-			uint32_t					DataBits	= 8						,
+			data_bits::data_bits		DataBits	= data_bits::eight		,
 			stop_bits::stop_bits		StopBits	= stop_bits::one		,
 			parity::parity				Parity		= parity::none			,
 			flow_control::flow_control	FlowControl	= flow_control::none	,
@@ -191,7 +214,7 @@ template <
 			uart_id::uart_id			UartID								,
 			mode::mode					Mode		= mode::tx_rx			,
 			uint32_t					BaudRate	= BAUDRATE_DEF			,
-			uint32_t					DataBits	= 8						,
+			data_bits::data_bits		DataBits	= data_bits::eight		,
 			stop_bits::stop_bits		StopBits	= stop_bits::one		,
 			parity::parity				Parity		= parity::none			,
 			flow_control::flow_control	FlowControl	= flow_control::none	,
