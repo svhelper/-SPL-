@@ -13,7 +13,7 @@
 #include <clock.hpp>
 
 //////////////////////////////////////////////////////////////////////////
-#include <stm32f1xx.h>
+#include "CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
 
 /************************************************************************/
 /*                                                                      */
@@ -29,7 +29,7 @@ namespace clock {
 		class max
 		{
 		public:
-			static const uint32_t SYSCLK	= 72000000UL;
+			static const uint32_t SYSCLK	= __MCU_MAX_FREQUENCY_HZ;
 
 			static const uint32_t HSECLK	= 25000000UL;
 			static const uint32_t LSECLK	= 1000000UL;
@@ -37,7 +37,7 @@ namespace clock {
 			static const uint32_t HCLK		= SYSCLK;
 			static const uint32_t USBCLK	= (uint32_t)(48000000UL * (1.E6 + USB_PPM) / 1.E6);
 			static const uint32_t APB1CLK	= 36000000UL;
-			static const uint32_t APB2CLK	= 72000000UL;
+			static const uint32_t APB2CLK	= SYSCLK;
 			static const uint32_t ADCCLK	= 14000000UL;
 
 			static const uint32_t FLASHCLK_LATENCY_0_Hz	= 24000000UL;			// Zero wait state
@@ -481,10 +481,10 @@ namespace clock {
 	typedef osc< ::mcu::clock::osc_type::high_speed_internal		, HSI_VALUE> osc_hsi;
 	typedef osc< ::mcu::clock::osc_type::low_speed_internal			, LSI_VALUE> osc_lsi;
 
-	typedef osc< ::mcu::clock::osc_type::high_speed_external		, HSE_VALUE> osc_hse;
-	typedef osc< ::mcu::clock::osc_type::high_speed_external_bypass	, HSE_VALUE> osc_hse_bypass;
-	typedef osc< ::mcu::clock::osc_type::low_speed_external			, LSE_VALUE> osc_lse;
-	typedef osc< ::mcu::clock::osc_type::low_speed_external_bypass	, LSE_VALUE> osc_lse_bypass;
+	typedef osc< ::mcu::clock::osc_type::high_speed_external		, METALLL_HSE_FREQ_HZ> osc_hse;
+	typedef osc< ::mcu::clock::osc_type::high_speed_external_bypass	, METALLL_HSE_FREQ_HZ> osc_hse_bypass;
+	typedef osc< ::mcu::clock::osc_type::low_speed_external			, METALLL_LSE_FREQ_HZ> osc_lse;
+	typedef osc< ::mcu::clock::osc_type::low_speed_external_bypass	, METALLL_LSE_FREQ_HZ> osc_lse_bypass;
 
 
 	//////////////////////////////////////////////////////////////////////////
@@ -1187,16 +1187,16 @@ template < state::state state, uint32_t Clock_Hz >
 class osc_lsi : public ::mcu::stm32::clock::osc< osc_type::low_speed_internal, Clock_Hz == CLOCK_HZ_DEF ? LSI_VALUE : Clock_Hz, state > {};
 
 template < state::state state, uint32_t Clock_Hz >
-class osc_hse : public ::mcu::stm32::clock::osc< osc_type::high_speed_external, Clock_Hz == CLOCK_HZ_DEF ? HSE_VALUE : Clock_Hz, state > {};
+class osc_hse : public ::mcu::stm32::clock::osc< osc_type::high_speed_external, Clock_Hz == CLOCK_HZ_DEF ? METALLL_HSE_FREQ_HZ : Clock_Hz, state > {};
 
 template < state::state state, uint32_t Clock_Hz >
-class osc_hse_bypass : public ::mcu::stm32::clock::osc< osc_type::high_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? HSE_VALUE : Clock_Hz, state > {};
+class osc_hse_bypass : public ::mcu::stm32::clock::osc< osc_type::high_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? METALLL_HSE_FREQ_HZ : Clock_Hz, state > {};
 
 template < state::state state, uint32_t Clock_Hz >
-class osc_lse : public ::mcu::stm32::clock::osc< osc_type::low_speed_external, Clock_Hz == CLOCK_HZ_DEF ? LSE_VALUE : Clock_Hz, state > {};
+class osc_lse : public ::mcu::stm32::clock::osc< osc_type::low_speed_external, Clock_Hz == CLOCK_HZ_DEF ? METALLL_LSE_FREQ_HZ : Clock_Hz, state > {};
 
 template < state::state state, uint32_t Clock_Hz >
-class osc_lse_bypass : public ::mcu::stm32::clock::osc< osc_type::low_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? LSE_VALUE : Clock_Hz, state > {};
+class osc_lse_bypass : public ::mcu::stm32::clock::osc< osc_type::low_speed_external_bypass, Clock_Hz == CLOCK_HZ_DEF ? METALLL_LSE_FREQ_HZ : Clock_Hz, state > {};
 
 //////////////////////////////////////////////////////////////////////////	
 template < state::state state > class pll_hsi
