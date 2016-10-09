@@ -255,7 +255,7 @@ template <
 			pin_id::pin_id				CkPinID			,
 			uint32_t					BaudRateAccuracyMax
 		>
-class uart_base : public obj::obj< objtype::uart, UartID >
+class uart_base : public obj::obj< obj::type_id::uart, UartID >
 {
 private:
 	
@@ -283,7 +283,7 @@ public:
 		static const flow_control::flow_control	_FlowControl	= FlowControl	;
 		
 		static const uint32_t					_alt_cfg_id		= _set_::_alt_cfg_id;
-		typedef      ::mcu::gpio::gpio< ::mcu::gpio::config::alt_output<TxPinID > >		_PinTx							;
+		typedef      alt_output<TxPinID >		_PinTx							;
 		typedef      alt_input <RxPinID >		_PinRx							;
 		typedef      alt_output<RtsPinID>		_PinRts							;
 		typedef      alt_input <CtsPinID>		_PinCts							;

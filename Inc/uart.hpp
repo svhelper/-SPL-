@@ -186,11 +186,11 @@ template <
 			stop_bits::stop_bits		StopBits	= stop_bits::one		,
 			parity::parity				Parity		= parity::none			,
 			flow_control::flow_control	FlowControl	= flow_control::none	,
-			class						PinTx		= gpio_invalid			,
-			class						PinRx		= gpio_invalid			,
-			class						PinRts		= gpio_invalid			,
-			class						PinCts		= gpio_invalid			,
-			class						PinCk		= gpio_invalid			,
+			class						PinTx		= dummy::obj			,
+			class						PinRx		= dummy::obj			,
+			class						PinRts		= dummy::obj			,
+			class						PinCts		= dummy::obj			,
+			class						PinCk		= dummy::obj			,
 			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
 		>
 class uart_gpio : public uart_base<
@@ -201,11 +201,11 @@ class uart_gpio : public uart_base<
 			StopBits				,
 			Parity					,
 			FlowControl				,
-			PinTx::_cfg_::_PinID	,
-			PinRx::_cfg_::_PinID	,
-			PinRts::_cfg_::_PinID	,
-			PinCts::_cfg_::_PinID	,
-			PinCk::_cfg_::_PinID	,
+			config::get_config<PinTx >::_cfg_::_PinID	,
+			config::get_config<PinRx >::_cfg_::_PinID	,
+			config::get_config<PinRts>::_cfg_::_PinID	,
+			config::get_config<PinCts>::_cfg_::_PinID	,
+			config::get_config<PinCk >::_cfg_::_PinID	,
 			BaudRateAccuracyMax
 	>
 {};

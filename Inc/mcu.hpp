@@ -28,7 +28,7 @@
 namespace mcu {
 
 template< typename sysclock, _VAR_ARGS_DEF( = dummy::obj ) >
-class mcu : public obj::obj< objtype::mcu >
+class mcu : public obj::obj< obj::type_id::mcu >
 {
 public:
 };

@@ -66,7 +66,7 @@ namespace device {
 					lcd_sck, lcd_mosi,
 					enc_a, enc_b,
 					//uart1_tx, uart1_rx,
-					gpio_invalid
+					::mcu::dummy::eol
 			> all_pins;
 } // namespace device
 
@@ -76,7 +76,7 @@ namespace device {
 	using namespace ::mcu::uart;
 	
 	//typedef uart_def< uart_id::uart_1, uart::mode::tx_only, 115200*8, data_bits::eight, stop_bits::one > uart1;
-	typedef uart_gpio< uart_id::uart_1, uart::mode::tx_only, 115200*8, data_bits::eight, stop_bits::one, parity::none, flow_control::none, uart1_tx, gpio_invalid > uart1;
+	typedef uart_gpio< uart_id::uart_1, uart::mode::tx_only, 115200*8, data_bits::eight, stop_bits::one, parity::none, flow_control::none, uart1_tx, dummy::obj > uart1;
 	
 	//typedef uart_def< uart_id::uart_1, uart::mode::tx_rx, 115200*8, data_bits::eight, stop_bits::one > uart1;
 	//typedef uart_gpio< uart_id::uart_1, uart::mode::tx_rx, 115200*8, data_bits::eight, stop_bits::one, parity::none, flow_control::none, uart1_tx, uart1_rx > uart1;
