@@ -322,6 +322,12 @@ private:
 	static const bool verified = config::check_params<_cfg_::_Mode, _cfg_::_Speed, _cfg_::_DefState, _cfg_::_Pull, _cfg_::_Flag>::verified;
 	
 public:
+	template <class sysclock>
+	static void init()
+	{
+		gpio_port< _CFG_ >::init();
+	}
+	
 	static void init()
 	{
 		gpio_port< _CFG_ >::init();
@@ -429,12 +435,14 @@ class alt_output : public gpio< config::alt_output<PinID, Speed, OpenDrain> > { 
 template < class LIST > class atomic_port;			// This class MUST BE implemented for target MCU
 
 template < _VAR_ARGS_DEF( = ::mcu::dummy::obj) >
-class atomic
+class atomic : public obj::obj< obj::type_id::gpio, 0xFFFFFFFF >
 {
 public:
 	typedef atomic_port< ::aux::list<_VAR_ARGS_LIST()> > _port_;
 
 public:
+	template <class sysclock>
+	static void init()		{ _port_::init();	}
 	static void init()		{ _port_::init();	}
 	static void update()	{ _port_::update();	}
 	static void write()		{ _port_::write();	}
