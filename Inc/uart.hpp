@@ -152,6 +152,8 @@ typedef enum
 
 const uint32_t	BAUDRATE_DEF			= 115200UL;		// bod
 const uint32_t	BAUDRATE_ACCURACY_MAX	= 3;			// percentage
+const uint32_t	ALT_FUNC_ID_DEF			= 0;			// Default - the primary of Alternative GPIO Function
+const uint32_t	ALT_FUNC_ID_AUTO		= 0xFFFFFFFF;	// Auto choosing of Alternative GPIO Function
 } //namespace uart
 
 /************************************************************************/
@@ -160,23 +162,160 @@ const uint32_t	BAUDRATE_ACCURACY_MAX	= 3;			// percentage
 using namespace ::mcu::gpio;
 using namespace ::mcu::uart;
 
-namespace uart {
-template <
-			uart_id::uart_id			UartID								,
-			mode::mode					Mode		= mode::tx_rx			,
-			uint32_t					BaudRate	= BAUDRATE_DEF			,
-			data_bits::data_bits		DataBits	= data_bits::eight		,
-			stop_bits::stop_bits		StopBits	= stop_bits::one		,
-			parity::parity				Parity		= parity::none			,
-			flow_control::flow_control	FlowControl	= flow_control::none	,
-			pin_id::pin_id				TxPinID		= pin_id::invalid		,
-			pin_id::pin_id				RxPinID		= pin_id::invalid		,
-			pin_id::pin_id				RtsPinID	= pin_id::invalid		,
-			pin_id::pin_id				CtsPinID	= pin_id::invalid		,
-			pin_id::pin_id				CkPinID		= pin_id::invalid		,
-			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
+namespace uart { namespace config {
+	template <
+				uart_id::uart_id			UartID										,
+				mode::mode					Mode		= mode::tx_rx					,
+				uint32_t					BaudRate	= BAUDRATE_DEF					,
+				data_bits::data_bits		DataBits	= data_bits::eight				,
+				stop_bits::stop_bits		StopBits	= stop_bits::one				,
+				parity::parity				Parity		= parity::none					,
+				flow_control::flow_control	FlowControl	= flow_control::none			,
+				::mcu::gpio::pin_id::pin_id	TxPinID		= ::mcu::gpio::pin_id::invalid	,
+				::mcu::gpio::pin_id::pin_id	RxPinID		= ::mcu::gpio::pin_id::invalid	,
+				::mcu::gpio::pin_id::pin_id	RtsPinID	= ::mcu::gpio::pin_id::invalid	,
+				::mcu::gpio::pin_id::pin_id	CtsPinID	= ::mcu::gpio::pin_id::invalid	,
+				::mcu::gpio::pin_id::pin_id	CkPinID		= ::mcu::gpio::pin_id::invalid	,
+				uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX	,
+				uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO				
+			>
+	struct config
+	{
+		static const uart_id::uart_id				_UartID			= UartID		;
+		static const mode::mode						_Mode			= Mode		    ;
+		static const uint32_t						_BaudRate		= BaudRate	    ;
+		static const data_bits::data_bits			_DataBits		= DataBits	    ;
+		static const stop_bits::stop_bits			_StopBits		= StopBits	    ;
+		static const parity::parity					_Parity			= Parity		;
+		static const flow_control::flow_control		_FlowControl	= FlowControl	;
+		static const ::mcu::gpio::pin_id::pin_id	_TxPinID		= TxPinID		;
+		static const ::mcu::gpio::pin_id::pin_id	_RxPinID		= RxPinID		;
+		static const ::mcu::gpio::pin_id::pin_id	_RtsPinID		= RtsPinID	    ;
+		static const ::mcu::gpio::pin_id::pin_id	_CtsPinID		= CtsPinID	    ;
+		static const ::mcu::gpio::pin_id::pin_id	_CkPinID		= CkPinID		;
+		static const uint32_t						_BaudRateAccuracyMax	= BaudRateAccuracyMax;
+		static const uint32_t						_AltFuncId		= AltFuncId		;
+	};
+
+	
+	template <
+				uart_id::uart_id			UartID								,
+				mode::mode					Mode		= mode::tx_rx			,
+				uint32_t					BaudRate	= BAUDRATE_DEF			,
+				data_bits::data_bits		DataBits	= data_bits::eight		,
+				stop_bits::stop_bits		StopBits	= stop_bits::one		,
+				parity::parity				Parity		= parity::none			,
+				flow_control::flow_control	FlowControl	= flow_control::none	,
+				class						PinTx		= dummy::obj			,
+				class						PinRx		= dummy::obj			,
+				class						PinRts		= dummy::obj			,
+				class						PinCts		= dummy::obj			,
+				class						PinCk		= dummy::obj			,
+				uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX,
+				uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO				
+			>
+	struct config_gpio : public config<
+				UartID					,
+				Mode					,
+				BaudRate				,
+				DataBits				,
+				StopBits				,
+				Parity					,
+				FlowControl				,
+				::mcu::gpio::config::get_config<PinTx >::_cfg_::_PinID	,
+				::mcu::gpio::config::get_config<PinRx >::_cfg_::_PinID	,
+				::mcu::gpio::config::get_config<PinRts>::_cfg_::_PinID	,
+				::mcu::gpio::config::get_config<PinCts>::_cfg_::_PinID	,
+				::mcu::gpio::config::get_config<PinCk >::_cfg_::_PinID	,
+				BaudRateAccuracyMax		,
+				AltFuncId				
 		>
-class uart_base;
+	{};
+
+	template <
+				uart_id::uart_id			UartID								,
+				mode::mode					Mode		= mode::tx_rx			,
+				uint32_t					BaudRate	= BAUDRATE_DEF			,
+				data_bits::data_bits		DataBits	= data_bits::eight		,
+				stop_bits::stop_bits		StopBits	= stop_bits::one		,
+				parity::parity				Parity		= parity::none			,
+				flow_control::flow_control	FlowControl	= flow_control::none	,
+				uint32_t					AltFuncId	= ALT_FUNC_ID_DEF		,
+				uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
+			>
+	struct config_def : public config<
+				UartID						,
+				Mode						,
+				BaudRate					,
+				DataBits					,
+				StopBits					,
+				Parity						,
+				FlowControl					,
+				::mcu::gpio::pin_id::invalid,
+				::mcu::gpio::pin_id::invalid,
+				::mcu::gpio::pin_id::invalid,
+				::mcu::gpio::pin_id::invalid,
+				::mcu::gpio::pin_id::invalid,
+				BaudRateAccuracyMax			,
+				AltFuncId					
+		>
+	{};
+
+} } //namespace uart::config
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+namespace uart {
+
+template < class CFG >
+class uart_port;
+
+template < class CFG >
+class uart
+	: public uart_port< CFG >
+	, public obj::obj< obj::type_id::uart, CFG::_UartID >
+{
+public:
+	typedef CFG _cfg_;
+
+public:
+	template <class sysclock>
+	class on_sysclock_changing
+	{
+	protected:
+		on_sysclock_changing();
+		~on_sysclock_changing();
+
+	public:
+		static void starting()
+		{
+			// Disable the peripheral
+			uart_port< CFG >::template on_sysclock_changing<sysclock>::starting();
+		}
+		static void finished()
+		{
+			// Enable peripheral
+			uart_port< CFG >::template on_sysclock_changing<sysclock>::finished();
+		}
+	};
+	
+	template <class sysclock>
+	static void init()
+	{
+		uart_port< CFG >::template init<sysclock>();
+	}
+	
+	static void update()
+	{
+		uart_port< CFG >::update();
+	}
+
+	static void putc(char c)
+	{
+		uart_port< CFG >::putc(c);
+	}
+};
 
 template <
 			uart_id::uart_id			UartID								,
@@ -191,23 +330,25 @@ template <
 			class						PinRts		= dummy::obj			,
 			class						PinCts		= dummy::obj			,
 			class						PinCk		= dummy::obj			,
-			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
+			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX,
+			uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO		
 		>
-class uart_gpio : public uart_base<
-			UartID					,
-			Mode					,
-			BaudRate				,
-			DataBits				,
-			StopBits				,
-			Parity					,
-			FlowControl				,
-			config::get_config<PinTx >::_cfg_::_PinID	,
-			config::get_config<PinRx >::_cfg_::_PinID	,
-			config::get_config<PinRts>::_cfg_::_PinID	,
-			config::get_config<PinCts>::_cfg_::_PinID	,
-			config::get_config<PinCk >::_cfg_::_PinID	,
-			BaudRateAccuracyMax
-	>
+class uart_gpio : public uart< config::config_gpio<
+			UartID				,
+			Mode				,
+			BaudRate			,
+			DataBits			,
+			StopBits			,
+			Parity				,
+			FlowControl			,
+			PinTx				,
+			PinRx				,
+			PinRts				,
+			PinCts				,
+			PinCk				,
+			BaudRateAccuracyMax	,
+			AltFuncId
+	> >
 {};
 
 template <
@@ -221,8 +362,18 @@ template <
 			uint32_t					AltFuncId	= 0						,
 			uint32_t					BaudRateAccuracyMax	= BAUDRATE_ACCURACY_MAX
 		>
-class uart_def;
-
+class uart_def : public uart< config::config_def<
+			UartID			,
+			Mode			,
+			BaudRate		,
+			DataBits		,
+			StopBits		,
+			Parity			,
+			FlowControl		,
+			AltFuncId		,
+			BaudRateAccuracyMax
+	> >
+{};
 
 /************************************************************************/
 /*                                                                      */
