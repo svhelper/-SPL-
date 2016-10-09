@@ -73,15 +73,22 @@ namespace device {
 namespace device {
 	// Declaration of modules
 	using namespace ::mcu;
-	using namespace ::mcu::uart;
+	//using namespace ::mcu::uart;
 	
-	//typedef uart_def< uart_id::uart_1, uart::mode::tx_only, 115200*8, data_bits::eight, stop_bits::one > uart1;
-	typedef uart_gpio< uart_id::uart_1, uart::mode::tx_only, 115200*8, data_bits::eight, stop_bits::one, parity::none, flow_control::none, uart1_tx, dummy::obj > uart1;
+	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
+	typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx > uart1;
 	
-	//typedef uart_def< uart_id::uart_1, uart::mode::tx_rx, 115200*8, data_bits::eight, stop_bits::one > uart1;
-	//typedef uart_gpio< uart_id::uart_1, uart::mode::tx_rx, 115200*8, data_bits::eight, stop_bits::one, parity::none, flow_control::none, uart1_tx, uart1_rx > uart1;
-	//typedef uart_def< uart_id::uart_1, uart::mode::tx_rx, 115200*8, data_bits::eight, stop_bits::one, uart::parity::none, uart::flow_control::none, 0 > uart1;
+	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
+	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx > uart1;
+	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, 0xFFFFFFFF > uart1;
+	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;
+	
+	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, dummy::obj, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;
+	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::rx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, dummy::obj, enc_b, dummy::obj, dummy::obj, dummy::obj, 3, 1 > uart1;
 
+	typedef ::mcu::clock::sysclock_pll_hse_def sysclk_def;
+	
+	typedef ::mcu::mcu<sysclk_def, uart1, all_pins> _mcu;
 } // namespace device
 
 
