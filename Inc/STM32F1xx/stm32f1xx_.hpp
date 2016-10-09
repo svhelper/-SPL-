@@ -86,6 +86,7 @@
 #include __METALLL_PORT(gpio.hpp)
 #include __METALLL_PORT(uart.hpp)
 //#include __METALLL_PORT(dma.hpp)
+#include __METALLL_PORT(mcu.hpp)
 
 /************************************************************************/
 /*                                                                      */
