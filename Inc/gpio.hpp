@@ -10,6 +10,8 @@
 #include <stdbool.h>
 #include <static_assert.hpp>
 
+#include <_aux_list.hpp>
+
 
 /************************************************************************/
 /*                                                                      */
@@ -276,13 +278,108 @@ namespace config {
 		static const bool verified = true;
 	};
 	
+	/************************************************************************/
+	/*                                                                      */
+	/************************************************************************/
+	template < ::mcu::obj::type_id::type_id TYPE, class OBJ >
+	struct get_config_c
+	{
+		typedef config<> _cfg_;
+	};
+
+	template < class OBJ >
+	struct get_config_c< ::mcu::obj::type_id::gpio, OBJ >
+	{
+		typedef typename OBJ::_cfg_ _cfg_;
+	};
+
+	template<class OBJ> struct get_config
+	{
+		typedef typename get_config_c< OBJ::_type_id, OBJ>::_cfg_ _cfg_;
+	};
+
 } // namespace config
 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/	
+template < class _CFG_ > class gpio_port;			// This class MUST BE implemented for target MCU
+
 template < class _CFG_ >
-class gpio;
+class gpio
+	: public gpio_port< _CFG_ >
+	, public obj::obj< obj::type_id::gpio, _CFG_::_PinID >
+{
+public:
+protected:
+	gpio();
+	~gpio();
+
+public:
+	typedef _CFG_ _cfg_;
+
+private:
+	static const bool verified = config::check_params<_cfg_::_Mode, _cfg_::_Speed, _cfg_::_DefState, _cfg_::_Pull, _cfg_::_Flag>::verified;
+	
+public:
+	static void init()
+	{
+		gpio_port< _CFG_ >::init();
+	}
+	
+	static void update()
+	{
+		gpio_port< _CFG_ >::update();
+	}
+	
+	static bool get()
+	{
+		// accessible at any time
+		return gpio_port< _CFG_ >::get();
+	}
+	static bool get_out()
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+		return gpio_port< _CFG_ >::get_out();
+	}
+	static void set()
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+		gpio_port< _CFG_ >::set();
+	}
+	static void reset()
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+		gpio_port< _CFG_ >::reset();
+	}
+
+	static void write(bool val)
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+		gpio_port< _CFG_ >::write(val);
+	}
+	static bool read()
+	{
+		// accessible at any time
+		return gpio_port< _CFG_ >::read();
+	}
+	
+	template <state::state NewState>
+	class _write_ : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, NewState    , _cfg_::_Pull, _cfg_::_Flag> >
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+	};
+	
+	class _set_   : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::set  , _cfg_::_Pull, _cfg_::_Flag> >
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+	};
+	
+	class _reset_ : public gpio< config::config<_cfg_::_PinID, _cfg_::_Mode, _cfg_::_Speed, state::reset, _cfg_::_Pull, _cfg_::_Flag> >
+	{
+		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
+	};
+};
 
 /************************************************************************/
 /*                                                                      */
@@ -329,11 +426,21 @@ class alt_output : public gpio< config::alt_output<PinID, Speed, OpenDrain> > { 
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-class gpio_dummy;
-typedef gpio_dummy gpio_invalid;
+template < class LIST > class atomic_port;			// This class MUST BE implemented for target MCU
 
-template < _VAR_ARGS_DEF( = gpio_dummy) >
-class atomic;
+template < _VAR_ARGS_DEF( = ::mcu::dummy::obj) >
+class atomic
+{
+public:
+	typedef atomic_port< ::aux::list<_VAR_ARGS_LIST()> > _port_;
+
+public:
+	static void init()		{ _port_::init();	}
+	static void update()	{ _port_::update();	}
+	static void write()		{ _port_::write();	}
+	static void set()		{ _port_::set();	}
+	static void reset()		{ _port_::reset();	}
+};
 
 /************************************************************************/
 /*                                                                      */
