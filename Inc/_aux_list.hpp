@@ -79,8 +79,6 @@ class list_traverse_c< ::mcu::dummy::eol, CALL_BACK >
 {
 public:
 	typedef typename CALL_BACK::template _cb< ::mcu::dummy::eol, ::mcu::dummy::eol >::_result _result;
-
-//	STATIC_ASSERT(false, "The item was not found!");
 };
 
 //------------------------------------------------------------------------
@@ -89,6 +87,39 @@ class list_traverse
 {
 public:
 	typedef typename list_traverse_c<CUR, CALL_BACK>::_result _result;
+};
+
+//////////////////////////////////////////////////////////////////////////
+template <class CUR, class CALL_BACK >
+class list_traverse_exec_c
+{
+public:
+	static bool exec()
+	{
+		return CALL_BACK::template _cb< CUR >() && list_traverse_exec_c<LIST_GET_NEXT(CUR), CALL_BACK>::exec();
+	}
+};
+
+//------------------------------------------------------------------------
+template < class CALL_BACK >
+class list_traverse_exec_c< ::mcu::dummy::eol, CALL_BACK >
+{
+public:
+	static bool exec()
+	{
+		return true;
+	}
+};
+
+//------------------------------------------------------------------------
+template <class CUR, class CALL_BACK >
+class list_traverse_exec
+{
+public:
+	static bool exec()
+	{
+		return list_traverse_exec_c<CUR, CALL_BACK>::exec();
+	}
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -112,6 +143,12 @@ public:
 	public:
 		typedef typename list_traverse<list_items, CALL_BACK>::_result _result;
 	};
+	
+	template < class CALL_BACK >
+	static bool traverse_exec()
+	{
+		return list_traverse_exec<list_items, CALL_BACK>::exec();
+	}
 };
 
 } // namespace aux
