@@ -76,11 +76,11 @@ namespace device {
 	//using namespace ::mcu::uart;
 	
 	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
-	typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx > uart1;
+	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx > uart1;
 	
-	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
+	typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx > uart1;
-	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, 0xFFFFFFFF > uart1;
+	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, ALT_FUNC_ID_AUTO > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;
 	
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, dummy::obj, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;

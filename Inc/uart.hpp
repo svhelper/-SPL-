@@ -154,6 +154,7 @@ const uint32_t	BAUDRATE_DEF			= 115200UL;		// bod
 const uint32_t	BAUDRATE_ACCURACY_MAX	= 3;			// percentage
 const uint32_t	ALT_FUNC_ID_DEF			= 0;			// Default - the primary of Alternative GPIO Function
 const uint32_t	ALT_FUNC_ID_AUTO		= 0xFFFFFFFF;	// Auto choosing of Alternative GPIO Function
+const uint32_t	TIMEOUT_INFINITE		= 0xFFFFFFFF;
 } //namespace uart
 
 /************************************************************************/
@@ -311,9 +312,43 @@ public:
 		uart_port< CFG >::update();
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	static bool has_data()
+	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::rx_only, "The UART is not configured for RX operations!");
+		return uart_port< CFG >::has_data();
+	}
+
+	static bool is_tx_empty()
+	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::tx_only, "The UART is not configured for TX operations!");
+		return uart_port< CFG >::is_tx_empty();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	static void putc(char c)
 	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::tx_only, "The UART is not configured for TX operations!");
 		uart_port< CFG >::putc(c);
+	}
+
+	static char getc()
+	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::rx_only, "The UART is not configured for RX operations!");
+		return uart_port< CFG >::getc();
+	}
+
+	//////////////////////////////////////////////////////////////////////////
+	static uint32_t read(void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
+	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::rx_only, "The UART is not configured for RX operations!");
+		return uart_port< CFG >::read(buf, size, timeout);
+	}
+
+	static uint32_t write(const void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
+	{
+		STATIC_ASSERT(_cfg_::_Mode & ::mcu::uart::mode::tx_only, "The UART is not configured for TX operations!");
+		return uart_port< CFG >::write(buf, size, timeout);
 	}
 };
 

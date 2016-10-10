@@ -335,6 +335,7 @@ public:
 		static const uint32_t _UART_REG					= REG_REMAP::_UART_REG				;
 		static const uint32_t _USART_CR1_UE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->CR1, USART_CR1_UE_Pos);
 		static const uint32_t _USART_SR_TXE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->SR, USART_SR_TXE_Pos);
+		static const uint32_t _USART_SR_RXNE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->SR, USART_SR_RXNE_Pos);
 		//static const uint32_t _USART_DR					= (uint32_t)(&((USART_TypeDef*)(uint32_t)_UART_REG)->DR);
 		static const uint32_t _USART_DR					= _UART_REG + (uint32_t)(&((USART_TypeDef*)0)->DR);
 		
@@ -497,10 +498,53 @@ public:
 	{
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+	static bool has_data()
+	{
+		return IS_BB_REG_SET(_cfg_::_USART_SR_RXNE_BB);
+	}
+
+	static bool is_tx_empty()
+	{
+		return IS_BB_REG_SET(_cfg_::_USART_SR_TXE_BB);
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	static void putc(char c)
 	{
 		while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB)) {}
-		WRITE_BB_REG(_cfg_::_USART_DR, c);	// WRITE_REG(_USART_DR, c);
+		WRITE_BB_REG(_cfg_::_USART_DR, c);
+	}
+
+	static char getc()
+	{
+		while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB)) {}
+		return READ_BB_REG(_cfg_::_USART_DR);
+	}
+	
+	//////////////////////////////////////////////////////////////////////////
+	static uint32_t read(void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
+	{
+		uint32_t len = 0;
+		uint8_t* p = (uint8_t*)buf;
+		for( ;size; len++, size--)
+		{
+			while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB)) {}
+			*p++ = READ_BB_REG(_cfg_::_USART_DR);
+		}
+		return len;
+	}
+
+	static uint32_t write(const void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
+	{
+		uint32_t len = 0;
+		uint8_t* p = (uint8_t*)buf;
+		for( ;size; len++, size--)
+		{
+			while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB)) {}
+			WRITE_BB_REG(_cfg_::_USART_DR, *p++);
+		}
+		return len;
 	}
 };
 
