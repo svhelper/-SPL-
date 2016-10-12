@@ -47,11 +47,16 @@ namespace uart {
 			uint32_t								BaudRateAccuracyMax,
 			uint32_t								AltFuncId
 		>
-	class uart_set;
+	class uart_set
+	{
+	public:
+		static const bool     _verified   = false;
+	};
 	
 #define _DEF_USART_CHKMODE(UartID, ALT_CFG_ID, MODE, FLOW_CTL, CkPinID, TxPinID, RxPinID, RtsPinID, CtsPinID, DmaID, DmaChTX, DmaChRX)		\
 	/* Verification whole configuration, if specified */ \
-	template <uint32_t BaudRate, data_bits::data_bits DataBits, stop_bits::stop_bits StopBits, parity::parity Parity, uint32_t BaudRateAccuracyMax> \
+	template <uint32_t BaudRate, ::mcu::uart::data_bits::data_bits DataBits, ::mcu::uart::stop_bits::stop_bits StopBits, \
+		::mcu::uart::parity::parity Parity, uint32_t BaudRateAccuracyMax> \
 	class uart_set< ::mcu::uart::uart_id::UartID, ::mcu::uart::mode::MODE, \
 		BaudRate, DataBits, StopBits, Parity, \
 		::mcu::uart::flow_control::FLOW_CTL, ::mcu::gpio::pin_id::CkPinID, \
@@ -66,12 +71,13 @@ namespace uart {
 		static const bool     _verified   = true; \
 	}; \
 	/* Verification of automatic AF configuration */ \
-	template <uint32_t BaudRate, data_bits::data_bits DataBits, stop_bits::stop_bits StopBits, parity::parity Parity, uint32_t BaudRateAccuracyMax> \
+	template <uint32_t BaudRate, ::mcu::uart::data_bits::data_bits DataBits, ::mcu::uart::stop_bits::stop_bits StopBits, \
+		::mcu::uart::parity::parity Parity, uint32_t BaudRateAccuracyMax> \
 	class uart_set< ::mcu::uart::uart_id::UartID, ::mcu::uart::mode::MODE, \
 		BaudRate, DataBits, StopBits, Parity, \
 		::mcu::uart::flow_control::FLOW_CTL, ::mcu::gpio::pin_id::CkPinID, \
 		::mcu::gpio::pin_id::TxPinID, ::mcu::gpio::pin_id::RxPinID, \
-		::mcu::gpio::pin_id::RtsPinID, ::mcu::gpio::pin_id::CtsPinID, BaudRateAccuracyMax, ALT_FUNC_ID_AUTO > \
+		::mcu::gpio::pin_id::RtsPinID, ::mcu::gpio::pin_id::CtsPinID, BaudRateAccuracyMax, ::mcu::uart::ALT_FUNC_ID_AUTO > \
 	{ \
 	public: \
 		static const uint32_t _alt_cfg_id = ALT_CFG_ID; \
@@ -81,7 +87,8 @@ namespace uart {
 		static const bool     _verified   = true; \
 	}; \
 	/* Automatic selection of AF configuration */ \
-	template <uint32_t BaudRate, data_bits::data_bits DataBits, stop_bits::stop_bits StopBits, parity::parity Parity, uint32_t BaudRateAccuracyMax> \
+	template <uint32_t BaudRate, ::mcu::uart::data_bits::data_bits DataBits, ::mcu::uart::stop_bits::stop_bits StopBits, \
+		::mcu::uart::parity::parity Parity, uint32_t BaudRateAccuracyMax> \
 	class uart_set< ::mcu::uart::uart_id::UartID, ::mcu::uart::mode::MODE, \
 		BaudRate, DataBits, StopBits, Parity, \
 		::mcu::uart::flow_control::FLOW_CTL, ::mcu::gpio::pin_id::invalid, \
@@ -145,16 +152,16 @@ DEFINE_UARTS(CHKMODE)
 	class uart_cfg_def
 	{
 	public:
-		static const uart::uart_id::uart_id	_UartID			= UartID				;
-		static const uint32_t				_alt_cfg_id		= AfID					;
+		static const uart::uart_id::uart_id			_UartID			= UartID				;
+		static const uint32_t						_alt_cfg_id		= AfID					;
 		static const ::mcu::gpio::pin_id::pin_id	_CkPinID		= ::mcu::gpio::pin_id::invalid	;
 		static const ::mcu::gpio::pin_id::pin_id	_TxPinID		= ::mcu::gpio::pin_id::invalid	;
 		static const ::mcu::gpio::pin_id::pin_id	_RxPinID		= ::mcu::gpio::pin_id::invalid	;
 		static const ::mcu::gpio::pin_id::pin_id	_RtsPinID		= ::mcu::gpio::pin_id::invalid	;
 		static const ::mcu::gpio::pin_id::pin_id	_CtsPinID		= ::mcu::gpio::pin_id::invalid	;
-		static const dma::dma_id::dma_id	_dma_id      	= dma::dma_id::invalid	;
-		static const dma::channel::channel	_dma_ch_tx  	= dma::channel::invalid	;
-		static const dma::channel::channel	_dma_ch_rx  	= dma::channel::invalid	;
+		static const dma::dma_id::dma_id			_dma_id      	= dma::dma_id::invalid	;
+		static const dma::channel::channel			_dma_ch_tx  	= dma::channel::invalid	;
+		static const dma::channel::channel			_dma_ch_rx  	= dma::channel::invalid	;
 	};
 
 
@@ -165,16 +172,16 @@ DEFINE_UARTS(CHKMODE)
 		> class uart_cfg_def<uart::uart_id::UartID, ALT_CFG_ID, Mode, FlowControl> \
 	{ \
 	public: \
-		static const uart::uart_id::uart_id	_UartID			= uart::uart_id::UartID		; \
-		static const uint32_t				_alt_cfg_id		= ALT_CFG_ID				; \
+		static const uart::uart_id::uart_id			_UartID			= uart::uart_id::UartID		; \
+		static const uint32_t						_alt_cfg_id		= ALT_CFG_ID				; \
 		static const ::mcu::gpio::pin_id::pin_id	_CkPinID		= (Mode        & ::mcu::uart::mode::sync_mask	) ? ::mcu::gpio::pin_id::CkPinID	: ::mcu::gpio::pin_id::invalid	; \
 		static const ::mcu::gpio::pin_id::pin_id	_TxPinID		= (Mode        & ::mcu::uart::mode::tx_only		) ? ::mcu::gpio::pin_id::TxPinID	: ::mcu::gpio::pin_id::invalid	; \
 		static const ::mcu::gpio::pin_id::pin_id	_RxPinID		= (Mode        & ::mcu::uart::mode::rx_only		) ? ::mcu::gpio::pin_id::RxPinID	: ::mcu::gpio::pin_id::invalid	; \
 		static const ::mcu::gpio::pin_id::pin_id	_RtsPinID		= (FlowControl & ::mcu::uart::flow_control::rts	) ? ::mcu::gpio::pin_id::RtsPinID	: ::mcu::gpio::pin_id::invalid	; \
 		static const ::mcu::gpio::pin_id::pin_id	_CtsPinID		= (FlowControl & ::mcu::uart::flow_control::cts	) ? ::mcu::gpio::pin_id::CtsPinID	: ::mcu::gpio::pin_id::invalid	; \
-		static const dma::dma_id::dma_id	_dma_id        	= dma::dma_id::DmaID		; \
-		static const dma::channel::channel	_dma_ch_tx  	= dma::channel::DmaChTX		; \
-		static const dma::channel::channel	_dma_ch_rx  	= dma::channel::DmaChRX		; \
+		static const dma::dma_id::dma_id			_dma_id        	= dma::dma_id::DmaID		; \
+		static const dma::channel::channel			_dma_ch_tx  	= dma::channel::DmaChTX		; \
+		static const dma::channel::channel			_dma_ch_rx  	= dma::channel::DmaChRX		; \
 	}; \
 	
 #define DEF_USART_CFG_DEF(UartID, ALT_CFG_ID, CkPinID, TxPinID, RxPinID, CtsPinID, RtsPinID, DmaID, DmaChTX, DmaChRX)		\
@@ -184,23 +191,17 @@ DEFINE_UARTS(CFG_DEF)
 
 	//////////////////////////////////////////////////////////////////////////
 
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
-template <uart_id::uart_id UartId, class sysclock, uint32_t PCLK_Hz>
-class uart_cfg2
-{
-public:
-	static const uint32_t	_PCLK_Hz = PCLK_Hz;
-};
-//////////////////////////////////////////////////////////////////////////
-template <uart_id::uart_id UartId, class sysclock> class uart_cfg   :
-	public uart_cfg2<UartId, sysclock, sysclock::_cfg_::_PCLK1_Hz> {};
-template <class sysclock> class uart_cfg<uart_id::uart_1, sysclock> :
-	public uart_cfg2<uart_id::uart_1, sysclock, sysclock::_cfg_::_PCLK2_Hz> {};
-template <class sysclock> class uart_cfg<uart_id::uart_6, sysclock> :
-	public uart_cfg2<uart_id::uart_1, sysclock, sysclock::_cfg_::_PCLK2_Hz> {};
+	template <uart_id::uart_id UartId, class sysclock, uint32_t PCLK_Hz>
+	class uart_cfg2
+	{
+	public:
+		static const uint32_t	_PCLK_Hz = PCLK_Hz;
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <uart_id::uart_id UartId, class sysclock> class uart_cfg   :
+		public uart_cfg2<UartId, sysclock, sysclock::_cfg_::_PCLK1_Hz> {};
+	template <class sysclock> class uart_cfg<uart_id::uart_1, sysclock> :
+		public uart_cfg2<uart_id::uart_1, sysclock, sysclock::_cfg_::_PCLK2_Hz> {};
 
 /************************************************************************/
 /*                                                                      */
@@ -286,7 +287,7 @@ private:
 		CFG::_AltFuncId
 		> _set_;
 	
-	static const bool _verified = _set_::_verified;			// Check mode<->pins configuration
+	STATIC_ASSERT(_set_::_verified != false, "The required configuration was not found! Please check mode<->pins::AF configuration.");
 	
 	typedef stm32::registers::REG_UART_REMAP<CFG::_UartID, _set_::_alt_cfg_id> REG_REMAP;
 	STATIC_ASSERT(_set_::_alt_cfg_id < REG_REMAP::_REMAP_MAX, "Internall error: The required configureation cannot be applied in the registers");
