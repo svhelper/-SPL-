@@ -63,7 +63,7 @@ namespace device {
 					ch3_r680, ch3_adc, ch3_r470k,
 					vbat_adc, vref_adc,
 					lcd_back, lcd_a0, lcd_cs, lcd_res,
-					lcd_sck, lcd_mosi,
+					//lcd_sck, lcd_mosi,
 					enc_a, enc_b,
 					//uart1_tx, uart1_rx,
 					::mcu::dummy::eol
@@ -86,9 +86,42 @@ namespace device {
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, dummy::obj, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::rx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, dummy::obj, enc_b, dummy::obj, dummy::obj, dummy::obj, 3, 1 > uart1;
 
+	//------------------------------------------------------------------------
+//	typedef spi_def< spi_id::spi_1 > spi1;
+//	typedef spi_def< spi_id::spi_1						
+//			, ::mcu::spi::mode::master_CPOL_1_CPHA_1	
+//			, ::mcu::spi::BAUDRATE_DEF					
+//			, ::mcu::spi::data_bits::_8_normal			
+//			, ::mcu::spi::bus::tx_rx_2_line				
+//			, ::mcu::gpio::pin_id::invalid				
+//			, ::mcu::gpio::pin_id::invalid				
+//			, ::mcu::gpio::pin_id::invalid				
+//			, ::mcu::gpio::pin_id::invalid				
+//			, ::mcu::spi::ALT_FUNC_ID_DEF				
+//		> spi1;
+//	typedef spi_gpio< spi_id::spi_1						
+//			, ::mcu::spi::mode::master_CPOL_1_CPHA_1	
+//			, ::mcu::spi::BAUDRATE_DEF					
+//			, ::mcu::spi::data_bits::_8_normal			
+//			, ::mcu::spi::bus::tx_only					
+//			, lcd_sck									
+//			, lcd_mosi									
+////			, dummy::invalid							
+////			, dummy::invalid							
+////			, ::mcu::spi::ALT_FUNC_ID_AUTO				
+//		> spi1;
+	typedef spi_def< spi_id::spi_1						
+			, ::mcu::spi::mode::master_CPOL_1_CPHA_1
+			, ::mcu::spi::BAUDRATE_MAX
+			, ::mcu::spi::data_bits::_8_normal
+			, ::mcu::spi::bus::tx_only
+			, 1
+		> spi1;
+	
+	//------------------------------------------------------------------------
 	typedef ::mcu::clock::sysclock_pll_hse_def sysclk_def;
 	
-	typedef ::mcu::mcu<sysclk_def, uart1, all_pins> _mcu;
+	typedef ::mcu::mcu<sysclk_def, uart1, spi1, all_pins> _mcu;
 } // namespace device
 
 

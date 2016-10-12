@@ -66,6 +66,23 @@
 //	----------##---+------+--+-----+-----+-----+-----+-----+------+----------+----+
 
 
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+//	--------##---+------+--+-----+------+------+-----+------+----------+----------+
+//	 DEF_SPI##CMD|  ID  |AF| SCLK| MOSI | MISO | NSS |  DMA |  DmaChTX |  DmaChRX |
+//	--------##---+------+--+-----+------+------+-----+------+----------+----------+
+#define DEFINE_SPIS(CMD)                                                           \
+	DEF_SPI_##CMD( spi_1, 0, PA5 ,  PA7 ,  PA6 , PA4 , dma_1, channel_3, channel_2)\
+	DEF_SPI_##CMD( spi_1, 1, PB3 ,  PB5 ,  PB4 , PA15, dma_1, channel_3, channel_2)\
+																				   \
+	DEF_SPI_##CMD( spi_2, 0, PB13,  PB15,  PB14, PB12, dma_1, channel_5, channel_4)\
+																				   \
+	DEF_SPI_##CMD( spi_3, 0, PB3 ,  PB5 ,  PB4 , PA15, dma_2, channel_2, channel_1)\
+	DEF_SPI_##CMD( spi_3, 1, PC10,  PC12,  PC11, PA4 , dma_2, channel_2, channel_1)\
+//	--------##---+------+--+-----+------+------+-----+------+----------+----------+
+
+
 
 /************************************************************************/
 /*                                                                      */
@@ -78,6 +95,7 @@
 #include "gpio.hpp"
 #include "dma.hpp"
 #include "uart.hpp"
+#include "spi.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 //#include <stm32f1xx.h>
@@ -85,6 +103,7 @@
 #include __METALLL_PORT(clock.hpp)
 #include __METALLL_PORT(gpio.hpp)
 #include __METALLL_PORT(uart.hpp)
+#include __METALLL_PORT(spi.hpp)
 //#include __METALLL_PORT(dma.hpp)
 #include __METALLL_PORT(mcu.hpp)
 
