@@ -25,21 +25,28 @@
 namespace device {
 	// Assigning GPIO
 	using namespace ::mcu::gpio;
+	using namespace ::mcu::adc;
 	
+	//------------------------------------------------------------------------
+	//typedef adc_def<adc_id::adc_1> adc1;
+	//typedef adc_def< adc_id::adc_1, ::mcu::adc::data_bits::_12bits_right > adc1;
+	typedef adc_def< adc_id::adc_1, ::mcu::adc::data_bits::_12bits_right, ::mcu::adc::flags::calibrate_at_startup, ::mcu::adc::sampling_delay_min::_15 > adc1;
+	
+	//------------------------------------------------------------------------
 	typedef output<pin_id::PA0> ch1_r680;
-	typedef analog<pin_id::PA1> ch1_adc;
+	typedef analog<pin_id::PA1, adc1> ch1_adc;
 	typedef output<pin_id::PA2> ch1_r470k;
 
 	typedef output<pin_id::PA3> ch2_r680;
-	typedef analog<pin_id::PA4> ch2_adc;
+	typedef analog<pin_id::PA4, adc1> ch2_adc;
 	typedef output<pin_id::PA5> ch2_r470k;
 
 	typedef output<pin_id::PB0> ch3_r680;
-	typedef analog<pin_id::PB1> ch3_adc;
+	typedef analog<pin_id::PB1, adc1> ch3_adc;
 	typedef output<pin_id::PB2> ch3_r470k;
 
-	typedef analog<pin_id::PA6> vbat_adc;
-	typedef analog<pin_id::PA7> vref_adc;
+	typedef analog<pin_id::PA6, adc1> vbat_adc;
+	typedef analog<pin_id::PA7, adc1> vref_adc;
 
 	typedef output<pin_id::PB13, state::reset> lcd_back;
 	typedef output<pin_id::PB9,  state::reset> lcd_a0;
@@ -78,7 +85,7 @@ namespace device {
 	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_only, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx > uart1;
 	
-	typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
+	typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8/512, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx > uart1;
 	//typedef uart_def< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, ALT_FUNC_ID_AUTO > uart1;
 	//typedef uart_gpio< uart_id::uart_1, ::mcu::uart::mode::tx_rx, 115200*8, ::mcu::uart::data_bits::eight, ::mcu::uart::stop_bits::one, ::mcu::uart::parity::none, ::mcu::uart::flow_control::none, uart1_tx, uart1_rx, dummy::obj, dummy::obj, dummy::obj, 3, 0 > uart1;
@@ -112,7 +119,7 @@ namespace device {
 //		> spi1;
 	typedef spi_def< spi_id::spi_1						
 			, ::mcu::spi::mode::master_CPOL_1_CPHA_1
-			, ::mcu::spi::BAUDRATE_MAX
+			, ::mcu::spi::BAUDRATE_DEF
 			, ::mcu::spi::data_bits::_8_normal
 			, ::mcu::spi::bus::tx_only
 			, 1
@@ -120,8 +127,9 @@ namespace device {
 	
 	//------------------------------------------------------------------------
 	typedef ::mcu::clock::sysclock_pll_hse_def sysclk_def;
+	typedef dma::dma<dma::dma_id::dma_1> dma1;
 	
-	typedef ::mcu::mcu<sysclk_def, uart1, spi1, all_pins> _mcu;
+	typedef ::mcu::mcu<sysclk_def, dma1, uart1, spi1, adc1, all_pins> _mcu;
 } // namespace device
 
 
