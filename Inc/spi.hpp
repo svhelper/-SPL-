@@ -199,20 +199,21 @@ namespace spi { namespace config {
 	template <
 				spi_id::spi_id				SpiID										,
 				mode::mode					Mode		= mode::master_CPOL_1_CPHA_1	,
-				uint32_t					BaudRate	= BAUDRATE_DEF					,
+				uint32_t					BaudRateMax	= BAUDRATE_DEF					,
 				data_bits::data_bits		DataBits	= data_bits::_8_normal			,
 				bus::bus					Bus			= bus::tx_rx_2_line				,
 				::mcu::gpio::pin_id::pin_id	SclkPinID	= ::mcu::gpio::pin_id::invalid	,
 				::mcu::gpio::pin_id::pin_id	MosiPinID	= ::mcu::gpio::pin_id::invalid	,
 				::mcu::gpio::pin_id::pin_id	MisoPinID	= ::mcu::gpio::pin_id::invalid	,
 				::mcu::gpio::pin_id::pin_id	NssPinID	= ::mcu::gpio::pin_id::invalid	,
-				uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO				
+				uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO				,
+				bool						UseDma		= false							
 			>
 	struct config
 	{
 		static const spi_id::spi_id					_SpiID			= SpiID			;
 		static const mode::mode						_Mode			= Mode		    ;
-		static const uint32_t						_BaudRate		= BaudRate		;
+		static const uint32_t						_BaudRateMax	= BaudRateMax	;
 		static const data_bits::data_bits			_DataBits		= DataBits		;
 		static const bus::bus						_Bus			= Bus			;
 		static const ::mcu::gpio::pin_id::pin_id	_SclkPinID		= SclkPinID		;
@@ -220,12 +221,13 @@ namespace spi { namespace config {
 		static const ::mcu::gpio::pin_id::pin_id	_MisoPinID		= MisoPinID		;
 		static const ::mcu::gpio::pin_id::pin_id	_NssPinID		= NssPinID		;
 		static const uint32_t						_AltFuncId		= AltFuncId		;
+		static const bool							_UseDma			= UseDma		;
 	};
 
 	template <
 				spi_id::spi_id				SpiID										,
 				mode::mode					Mode		= mode::master_CPOL_1_CPHA_0	,
-				uint32_t					BaudRate	= BAUDRATE_DEF					,
+				uint32_t					BaudRateMax	= BAUDRATE_DEF					,
 				data_bits::data_bits		DataBits	= data_bits::_8_normal			,
 				bus::bus					Bus			= bus::tx_rx_2_line				,
 				class						SclkPin		= dummy::obj					,
@@ -237,7 +239,7 @@ namespace spi { namespace config {
 	struct config_gpio : public config<
 				SpiID			,
 				Mode			,
-				BaudRate		,
+				BaudRateMax		,
 				DataBits		,
 				Bus				,
 				::mcu::gpio::config::get_config<SclkPin	>::_cfg_::_PinID,
@@ -251,7 +253,7 @@ namespace spi { namespace config {
 	template <
 				spi_id::spi_id				SpiID										,
 				mode::mode					Mode		= mode::master_CPOL_1_CPHA_0	,
-				uint32_t					BaudRate	= BAUDRATE_DEF					,
+				uint32_t					BaudRateMax	= BAUDRATE_DEF					,
 				data_bits::data_bits		DataBits	= data_bits::_8_normal			,
 				bus::bus					Bus			= bus::tx_rx_2_line				,
 				uint32_t					AltFuncId	= ALT_FUNC_ID_DEF				
@@ -259,7 +261,7 @@ namespace spi { namespace config {
 	struct config_def : public config<
 				SpiID			,
 				Mode			,
-				BaudRate		,
+				BaudRateMax		,
 				DataBits		,
 				Bus				,
 				::mcu::gpio::pin_id::invalid,
@@ -367,7 +369,7 @@ public:
 template <
 			spi_id::spi_id				SpiID										,
 			mode::mode					Mode		= mode::master_CPOL_1_CPHA_0	,
-			uint32_t					BaudRate	= BAUDRATE_DEF					,
+			uint32_t					BaudRateMax	= BAUDRATE_DEF					,
 			data_bits::data_bits		DataBits	= data_bits::_8_normal			,
 			bus::bus					Bus			= bus::tx_rx_2_line				,
 			class						SclkPin		= dummy::obj					,
@@ -376,18 +378,18 @@ template <
 			class						NssPin		= dummy::obj					,
 			uint32_t					AltFuncId	= ALT_FUNC_ID_AUTO				
 		>
-class spi_gpio : public spi< config::config_gpio<SpiID, Mode, BaudRate, DataBits, Bus, SclkPin, MosiPin, MisoPin, NssPin, AltFuncId> >
+class spi_gpio : public spi< config::config_gpio<SpiID, Mode, BaudRateMax, DataBits, Bus, SclkPin, MosiPin, MisoPin, NssPin, AltFuncId> >
 {};
 
 template <
 			spi_id::spi_id				SpiID										,
 			mode::mode					Mode		= mode::master_CPOL_1_CPHA_0	,
-			uint32_t					BaudRate	= BAUDRATE_DEF					,
+			uint32_t					BaudRateMax	= BAUDRATE_DEF					,
 			data_bits::data_bits		DataBits	= data_bits::_8_normal			,
 			bus::bus					Bus			= bus::tx_rx_2_line				,
 			uint32_t					AltFuncId	= ALT_FUNC_ID_DEF				
 		>
-class spi_def : public spi< config::config_def<SpiID, Mode, BaudRate, DataBits, Bus, AltFuncId> >
+class spi_def : public spi< config::config_def<SpiID, Mode, BaudRateMax, DataBits, Bus, AltFuncId> >
 {};
 
 /************************************************************************/

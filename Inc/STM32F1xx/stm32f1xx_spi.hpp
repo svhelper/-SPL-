@@ -11,7 +11,7 @@
 #include <static_assert.hpp>
 
 //#include <gpio.hpp>
-//#include <dma.hpp>
+#include <dma.hpp>
 #include <spi.hpp>
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,7 +35,7 @@ namespace spi {
 			::mcu::spi::spi_id::spi_id				SpiID		,
 			::mcu::spi::mode::mode					Mode		,
 			uint32_t /*::mcu::spi::mode::mode*/		Master		,
-			uint32_t								BaudRate	,
+			uint32_t								BaudRateMax	,
 			::mcu::spi::data_bits::data_bits		DataBits	,
 			::mcu::spi::bus::bus					Bus			,
 			::mcu::gpio::pin_id::pin_id				SclkPinID	,
@@ -52,8 +52,8 @@ namespace spi {
 	
 #define _DEF_SPI_CHKMODE(SpiID, ALT_CFG_ID, Master, Bus, SclkPinID, MosiPinID, MisoPinID, NssPinID, DmaID, DmaChTX, DmaChRX)		\
 	/* Verification whole configuration, if specified */ \
-	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRate, ::mcu::spi::data_bits::data_bits DataBits > \
-	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRate, DataBits, \
+	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRateMax, ::mcu::spi::data_bits::data_bits DataBits > \
+	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRateMax, DataBits, \
 		::mcu::spi::bus::Bus, \
 		::mcu::gpio::pin_id::SclkPinID, ::mcu::gpio::pin_id::MosiPinID, \
 		::mcu::gpio::pin_id::MisoPinID, ::mcu::gpio::pin_id::NssPinID, \
@@ -61,11 +61,14 @@ namespace spi {
 	{ \
 	public: \
 		static const uint32_t _alt_cfg_id = ALT_CFG_ID; \
+		static const ::mcu::dma::dma_id::dma_id			_DmaID		= ::mcu::dma::dma_id::DmaID		; \
+		static const ::mcu::dma::channel::channel		_DmaChTX	= ::mcu::dma::channel::DmaChTX	; \
+		static const ::mcu::dma::channel::channel		_DmaChRX	= ::mcu::dma::channel::DmaChRX	; \
 		static const bool     _verified   = true; \
 	}; \
 	/* Verification of automatic AF configuration */ \
-	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRate, ::mcu::spi::data_bits::data_bits DataBits > \
-	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRate, DataBits, \
+	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRateMax, ::mcu::spi::data_bits::data_bits DataBits > \
+	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRateMax, DataBits, \
 		::mcu::spi::bus::Bus, \
 		::mcu::gpio::pin_id::SclkPinID, ::mcu::gpio::pin_id::MosiPinID, \
 		::mcu::gpio::pin_id::MisoPinID, ::mcu::gpio::pin_id::NssPinID, \
@@ -73,11 +76,14 @@ namespace spi {
 	{ \
 	public: \
 		static const uint32_t _alt_cfg_id = ALT_CFG_ID; \
+		static const ::mcu::dma::dma_id::dma_id			_DmaID		= ::mcu::dma::dma_id::DmaID		; \
+		static const ::mcu::dma::channel::channel		_DmaChTX	= ::mcu::dma::channel::DmaChTX	; \
+		static const ::mcu::dma::channel::channel		_DmaChRX	= ::mcu::dma::channel::DmaChRX	; \
 		static const bool     _verified   = true; \
 	}; \
 	/* Automatic selection of AF configuration */ \
-	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRate, ::mcu::spi::data_bits::data_bits DataBits > \
-	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRate, DataBits, \
+	template < ::mcu::spi::mode::mode Mode, uint32_t BaudRateMax, ::mcu::spi::data_bits::data_bits DataBits > \
+	class spi_set< ::mcu::spi::spi_id::SpiID, Mode, ::mcu::spi::mode::Master, BaudRateMax, DataBits, \
 		::mcu::spi::bus::Bus, \
 		::mcu::gpio::pin_id::invalid, ::mcu::gpio::pin_id::invalid, \
 		::mcu::gpio::pin_id::invalid, ::mcu::gpio::pin_id::invalid, \
@@ -85,6 +91,9 @@ namespace spi {
 	{ \
 	public: \
 		static const uint32_t _alt_cfg_id = ALT_CFG_ID; \
+		static const ::mcu::dma::dma_id::dma_id			_DmaID		= ::mcu::dma::dma_id::DmaID		; \
+		static const ::mcu::dma::channel::channel		_DmaChTX	= ::mcu::dma::channel::DmaChTX	; \
+		static const ::mcu::dma::channel::channel		_DmaChRX	= ::mcu::dma::channel::DmaChRX	; \
 		static const bool     _verified   = true; \
 	}; \
 	
@@ -192,6 +201,21 @@ DEFINE_SPIS(CFG_DEF)
 	template <class sysclock> class spi_cfg<spi_id::spi_1, sysclock> :
 		public spi_cfg2<spi_id::spi_1, sysclock, sysclock::_cfg_::_PCLK2_Hz> {};
 
+	//////////////////////////////////////////////////////////////////////////
+	template <spi_id::spi_id SpiId, IRQn_Type IRQn>
+	class spi_irqn2
+	{
+	public:
+		static const IRQn_Type _IRQn = IRQn;
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <spi_id::spi_id SpiId> class spi_irqn;
+	//{
+	//	STATIC_ASSERT(false, "The required configuration was not found!");
+	//};
+	template <> class spi_irqn<spi_id::spi_1> :		public spi_irqn2<spi_id::spi_1, SPI1_IRQn> {};
+	template <> class spi_irqn<spi_id::spi_2> :		public spi_irqn2<spi_id::spi_2, SPI2_IRQn> {};
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -262,7 +286,7 @@ class spi_port
 {
 private:
 	typedef stm32::spi::spi_set< CFG::_SpiID, CFG::_Mode, CFG::_Mode & ::mcu::spi::mode::_master,
-		CFG::_BaudRate, CFG::_DataBits, CFG::_Bus,
+		CFG::_BaudRateMax, CFG::_DataBits, CFG::_Bus,
 		CFG::_SclkPinID, CFG::_MosiPinID, CFG::_MisoPinID, CFG::_NssPinID, CFG::_AltFuncId > _set_;
 	
 	STATIC_ASSERT(_set_::_verified != false, "The required configuration was not found! Please check mode<->pins::AF configuration.");
@@ -276,12 +300,15 @@ public:
 	public:
 		static const spi_id::spi_id				_SpiID			= CFG::_SpiID			;
 		static const mode::mode					_Mode			= CFG::_Mode		    ;
-		static const uint32_t					_BaudRate		= CFG::_BaudRate		;
+		static const uint32_t					_BaudRateMax	= CFG::_BaudRateMax		;
 		static const data_bits::data_bits		_DataBits		= CFG::_DataBits		;
 		static const bus::bus					_Bus			= CFG::_Bus				;
 		static const uint32_t					_AltFuncId		= CFG::_AltFuncId		;
 		
 		static const uint32_t					_alt_cfg_id		= _set_::_alt_cfg_id;
+
+		static const bool						_UseDmaTX			= CFG::_UseDma && _set_::_DmaID != ::mcu::dma::dma_id::invalid && _set_::_DmaChTX != ::mcu::dma::channel::invalid;
+		static const bool						_UseDmaRX			= CFG::_UseDma && _set_::_DmaID != ::mcu::dma::dma_id::invalid && _set_::_DmaChRX != ::mcu::dma::channel::invalid;
 
 		static const ::mcu::gpio::pin_id::pin_id
 			_SclkPinID	= stm32::spi::spi_cfg_def<_SpiID, _alt_cfg_id, _Mode & ::mcu::spi::mode::_master, _Bus>::_SclkPinID	,
@@ -299,6 +326,8 @@ public:
 		typedef      alt_input <_MisoPinID					>	_MisoPin					;
 		typedef      alt_output<_NssPinID	, speed::high	>	_NssPin						;
 		
+		static const IRQn_Type					_IRQn					= stm32::spi::spi_irqn<_SpiID>::_IRQn;
+		
 		static const uint32_t _AFIO_MAPR_REMAP_MASK		= REG_REMAP::_AFIO_MAPR_REMAP_MASK	;
 		static const uint32_t _AFIO_MAPR_REMAP			= REG_REMAP::_AFIO_MAPR_REMAP		;
 		static const uint32_t _AFIO_MAPR2_REMAP_MASK	= REG_REMAP::_AFIO_MAPR2_REMAP_MASK	;
@@ -307,6 +336,12 @@ public:
 		static const uint32_t _SPI_REG					= REG_REMAP::_SPI_REG				;
 
 		static const uint32_t _SPI_CR1_SPE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->CR1, SPI_CR1_SPE_Pos);
+
+		static const uint32_t _SPI_CR2_TXEIE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->CR2, SPI_CR2_TXEIE_Pos);
+		static const uint32_t _SPI_CR2_RXNEIE_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->CR2, SPI_CR2_RXNEIE_Pos);
+
+		static const uint32_t _SPI_CR2_TXDMAEN_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->CR2, SPI_CR2_TXDMAEN_Pos);
+		static const uint32_t _SPI_CR2_RXDMAEN_BB		= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->CR2, SPI_CR2_RXDMAEN_Pos);
 		
 		static const uint32_t _SPI_SR_BSY_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->SR, SPI_SR_BSY_Pos);
 		static const uint32_t _SPI_SR_OVR_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((SPI_TypeDef*)_SPI_REG)->SR, SPI_SR_OVR_Pos);
@@ -373,19 +408,19 @@ public:
 			static const uint32_t _PCLK_Hz = spi_cfg::_PCLK_Hz;
 
 			static const uint32_t _br =
-				(_PCLK_Hz /   2) <= _cfg_::_BaudRate ?	0 :
-				(_PCLK_Hz /   4) <= _cfg_::_BaudRate ?	1 :
-				(_PCLK_Hz /   8) <= _cfg_::_BaudRate ?	2 :
-				(_PCLK_Hz /  16) <= _cfg_::_BaudRate ?	3 :
-				(_PCLK_Hz /  32) <= _cfg_::_BaudRate ?	4 :
-				(_PCLK_Hz /  64) <= _cfg_::_BaudRate ?	5 :
-				(_PCLK_Hz / 128) <= _cfg_::_BaudRate ?	6 :
-														7 ;
+				(_PCLK_Hz /   2) <= _cfg_::_BaudRateMax ?	0 :
+				(_PCLK_Hz /   4) <= _cfg_::_BaudRateMax ?	1 :
+				(_PCLK_Hz /   8) <= _cfg_::_BaudRateMax ?	2 :
+				(_PCLK_Hz /  16) <= _cfg_::_BaudRateMax ?	3 :
+				(_PCLK_Hz /  32) <= _cfg_::_BaudRateMax ?	4 :
+				(_PCLK_Hz /  64) <= _cfg_::_BaudRateMax ?	5 :
+				(_PCLK_Hz / 128) <= _cfg_::_BaudRateMax ?	6 :
+															7 ;
 			// calculate actual baud rate
 			static const uint32_t _BaudRate_Real = _PCLK_Hz / (1UL << (_br + 1));
 			
 			// calculate baud rate accuracy
-			//static const int32_t  _percent = ((int32_t)_BaudRate_Real - (int32_t)_cfg_::_BaudRate) * 100 / (int32_t)_cfg_::_BaudRate;
+			//static const int32_t  _percent = ((int32_t)_BaudRate_Real - (int32_t)_cfg_::_BaudRateMax) * 100 / (int32_t)_cfg_::_BaudRateMax;
 
 			// assemble value for BRR register
 			static const uint32_t _SPI_CR1 = (_cfg_::_SPI_CR1 & ~SPI_CR1_BR_Msk) | ((_br << SPI_CR1_BR_Pos) & SPI_CR1_BR_Msk);
@@ -432,23 +467,6 @@ public:
 		if(_cfg_::_AFIO_MAPR2_REMAP_MASK)
 			MODIFY_REG(AFIO->MAPR2, _cfg_::_AFIO_MAPR2_REMAP_MASK, _cfg_::_AFIO_MAPR2_REMAP);
 
-		//// Peripheral DMA init
-
-		//hdma_spi1_tx.Instance = DMA1_Channel3;
-		//hdma_spi1_tx.Init.Direction = DMA_MEMORY_TO_PERIPH;
-		//hdma_spi1_tx.Init.PeriphInc = DMA_PINC_DISABLE;
-		//hdma_spi1_tx.Init.MemInc = DMA_MINC_ENABLE;
-		//hdma_spi1_tx.Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
-		//hdma_spi1_tx.Init.MemDataAlignment = DMA_MDATAALIGN_BYTE;
-		//hdma_spi1_tx.Init.Mode = DMA_NORMAL;
-		//hdma_spi1_tx.Init.Priority = DMA_PRIORITY_LOW;
-		//if (HAL_DMA_Init(&hdma_spi1_tx) != HAL_OK)
-		//{
-		//Error_Handler();
-		//}
-
-		//__HAL_LINKDMA(hspi,hdmatx,hdma_spi1_tx);
-
 		// Disable the peripheral
 		RESET_BB_REG(_cfg_::_SPI_CR1_SPE_BB);		// on_sysclock_changing<sysclock>::starting();
 
@@ -474,41 +492,96 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	static void putc(char c)
 	{
-		while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB)) {}
+		while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB))
+		{
+			//__WFE();
+			//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+		}
 		WRITE_BB_REG(_cfg_::_SPI_DR, c);
 	}
 
 	static char getc()
 	{
-		while(IS_BB_REG_RESET(_cfg_::_SPI_SR_RXNE_BB)) {}
+		while(IS_BB_REG_RESET(_cfg_::_SPI_SR_RXNE_BB))
+		{
+			//__WFE();
+			//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+		}
 		return READ_BB_REG(_cfg_::_SPI_DR);
 	}
 	
 	//////////////////////////////////////////////////////////////////////////
+	struct _wfe
+	{
+		static uint32_t read(uint8_t* buf, uint32_t size, uint32_t timeout)
+		{
+			uint32_t len = 0;
+			for( ;size; len++, size--)
+			{
+				while(IS_BB_REG_RESET(_cfg_::_SPI_SR_RXNE_BB))
+				{
+					//__WFE();
+					//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+				}
+				*buf++ = READ_BB_REG(_cfg_::_SPI_DR);
+			}
+			return len;
+		}
+
+		static uint32_t write(const uint8_t* buf, uint32_t size, uint32_t timeout)
+		{
+			uint32_t len = 0;
+			//SET_BB_REG(_cfg_::_SPI_CR2_TXEIE_BB);
+			for( ;size; len++, size--)
+			{
+				while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB))
+				{
+					//__WFE();
+					//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+				}
+				WRITE_BB_REG(_cfg_::_SPI_DR, *buf++);
+				//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+			}
+			//RESET_BB_REG(_cfg_::_SPI_CR2_TXEIE_BB);
+			//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+			
+			while(IS_BB_REG_SET(_cfg_::_SPI_SR_BSY_BB)) {}		//while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB)) {}
+			return len;
+		}
+	};
+
+	//////////////////////////////////////////////////////////////////////////
+	struct _dma
+	{
+		static uint32_t read(uint8_t* buf, uint32_t size, uint32_t timeout)
+		{
+			return ::mcu::dma::dma<_set_::_DmaID>::template
+				read<_cfg_::_SPI_CR2_RXDMAEN_BB, _set_::_DmaChRX, dma::level::low>(_cfg_::_SPI_DR, buf, size, timeout);
+		}
+
+		static uint32_t write(const uint8_t* buf, uint32_t size, uint32_t timeout)
+		{
+			size =
+				::mcu::dma::dma<_set_::_DmaID>::template
+				write<_cfg_::_SPI_CR2_TXDMAEN_BB, _set_::_DmaChTX, dma::level::low>(_cfg_::_SPI_DR, buf, size, timeout);
+			
+			while(IS_BB_REG_SET(_cfg_::_SPI_SR_BSY_BB)) {}		//while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB)) {}
+			return size;
+		}
+	};
+	
+	//////////////////////////////////////////////////////////////////////////
 	static uint32_t read(void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
 	{
-		uint32_t len = 0;
-		uint8_t* p = (uint8_t*)buf;
-		for( ;size; len++, size--)
-		{
-			while(IS_BB_REG_RESET(_cfg_::_SPI_SR_RXNE_BB)) {}
-			*p++ = READ_BB_REG(_cfg_::_SPI_DR);
-		}
-		return len;
+		return ::aux::if_c<_cfg_::_UseDmaRX, _dma, _wfe>::_result ::
+			read((uint8_t*)buf, size, timeout);
 	}
 
+	//////////////////////////////////////////////////////////////////////////
 	static uint32_t write(const void* buf, uint32_t size, uint32_t timeout = TIMEOUT_INFINITE)
 	{
-		uint32_t len = 0;
-		uint8_t* p = (uint8_t*)buf;
-		for( ;size; len++, size--)
-		{
-			while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB)) {}
-			WRITE_BB_REG(_cfg_::_SPI_DR, *p++);
-		}
-		//while(IS_BB_REG_RESET(_cfg_::_SPI_SR_TXE_BB)) {}
-		while(IS_BB_REG_SET(_cfg_::_SPI_SR_BSY_BB)) {}
-		return len;
+		return ::aux::if_c<_cfg_::_UseDmaTX, _dma, _wfe>::_result ::
+			write((const uint8_t*)buf, size, timeout);
 	}
 };
 
