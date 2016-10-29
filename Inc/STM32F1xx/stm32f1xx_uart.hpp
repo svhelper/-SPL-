@@ -203,6 +203,22 @@ DEFINE_UARTS(CFG_DEF)
 	template <class sysclock> class uart_cfg<uart_id::uart_1, sysclock> :
 		public uart_cfg2<uart_id::uart_1, sysclock, sysclock::_cfg_::_PCLK2_Hz> {};
 
+	//////////////////////////////////////////////////////////////////////////
+	template <uart_id::uart_id UartId, IRQn_Type IRQn>
+	class uart_irqn2
+	{
+	public:
+		static const IRQn_Type _IRQn = IRQn;
+	};
+	//////////////////////////////////////////////////////////////////////////
+	template <uart_id::uart_id UartId> class uart_irqn;
+	//{
+	//	STATIC_ASSERT(false, "The required configuration was not found!");
+	//};
+	template <> class uart_irqn<uart_id::uart_1> :		public uart_irqn2<uart_id::uart_1, USART1_IRQn> {};
+	template <> class uart_irqn<uart_id::uart_2> :		public uart_irqn2<uart_id::uart_2, USART2_IRQn> {};
+	template <> class uart_irqn<uart_id::uart_3> :		public uart_irqn2<uart_id::uart_3, USART3_IRQn> {};
+
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
@@ -256,7 +272,7 @@ namespace registers {
 		: public REG_UART_REMAP_BASE<
 			uart_id::uart_3, AfID,
 			AFIO_MAPR_USART3_REMAP_Pos, AFIO_MAPR_USART3_REMAP_Msk,
-			(uint32_t)USART2, FROM_ADDRESS_BIT_POS_TO_BB(&RCC->APB1ENR, RCC_APB1ENR_USART3EN_Pos)
+			(uint32_t)USART3, FROM_ADDRESS_BIT_POS_TO_BB(&RCC->APB1ENR, RCC_APB1ENR_USART3EN_Pos)
 		> {};
 
 } // namespace registers
@@ -328,6 +344,8 @@ public:
 		static const uint32_t					_BaudRateAccuracyMax	= CFG::_BaudRateAccuracyMax;
 		static const uint32_t					_AltFuncId				= CFG::_AltFuncId;
 		
+		static const IRQn_Type					_IRQn					= stm32::uart::uart_irqn<_UartID>::_IRQn;
+		
 		static const uint32_t _AFIO_MAPR_REMAP_MASK		= REG_REMAP::_AFIO_MAPR_REMAP_MASK	;
 		static const uint32_t _AFIO_MAPR_REMAP			= REG_REMAP::_AFIO_MAPR_REMAP		;
 		static const uint32_t _AFIO_MAPR2_REMAP_MASK	= REG_REMAP::_AFIO_MAPR2_REMAP_MASK	;
@@ -335,8 +353,10 @@ public:
 		
 		static const uint32_t _UART_REG					= REG_REMAP::_UART_REG				;
 		static const uint32_t _USART_CR1_UE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->CR1, USART_CR1_UE_Pos);
+		static const uint32_t _USART_CR1_TE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->CR1, USART_CR1_TE_Pos);
 		static const uint32_t _USART_SR_TXE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->SR, USART_SR_TXE_Pos);
 		static const uint32_t _USART_SR_RXNE_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->SR, USART_SR_RXNE_Pos);
+		static const uint32_t _USART_SR_TC_BB			= FROM_ADDRESS_BIT_POS_TO_BB(&((USART_TypeDef*)_UART_REG)->SR, USART_SR_TC_Pos);
 		//static const uint32_t _USART_DR					= (uint32_t)(&((USART_TypeDef*)(uint32_t)_UART_REG)->DR);
 		static const uint32_t _USART_DR					= _UART_REG + (uint32_t)(&((USART_TypeDef*)0)->DR);
 		
@@ -353,12 +373,12 @@ public:
 				(0) ) : (0) ) |
 			(	(_Mode & mode::tx_only) ? (
 				( USART_CR1_TE ) |
-				( 0 /*USART_CR1_TXEIE*/) |		// <-- TODO: Implement IRQ
+				//( USART_CR1_TXEIE ) |
 				( 0 /*USART_CR1_TCIE*/) |		// <-- TODO: Implement IRQ
 				(0) ) : (0) ) |
 			(	(_Mode & mode::rx_only) ? (
 				( USART_CR1_RE ) |
-				( 0 /*USART_CR1_RXNEIE*/) |		// <-- TODO: Implement IRQ
+				//( USART_CR1_RXNEIE ) |
 				( 0 /*USART_CR1_RWU*/) |
 				(0) ) : (0) ) |
 			( 0 /*USART_CR1_IDLEIE*/) |		// <-- TODO: Implement IRQ
@@ -446,8 +466,16 @@ public:
 	public:
 		static void starting()
 		{
+			// wait for completion of transmission
+			while(	IS_BB_REG_SET(_cfg_::_USART_CR1_TE_BB) &&
+					( IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB) || IS_BB_REG_RESET(_cfg_::_USART_SR_TC_BB) )
+				) {}
+
+			// wait for completion of reception
+			// <-- TODO: Implement
+
 			// Disable the peripheral
-			RESET_BB_REG(_cfg_::_USART_CR1_UE_BB);			// <-- TODO: Implement waiting for IO completion before disabling
+			RESET_BB_REG(_cfg_::_USART_CR1_UE_BB);
 		}
 		static void finished()
 		{
@@ -513,13 +541,21 @@ public:
 	//////////////////////////////////////////////////////////////////////////
 	static void putc(char c)
 	{
-		while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB)) {}
+		while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB))
+		{
+			//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+			//__WFE();
+		}
 		WRITE_BB_REG(_cfg_::_USART_DR, c);
 	}
 
 	static char getc()
 	{
-		while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB)) {}
+		while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB))
+		{
+			//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+			//__WFE();
+		}
 		return READ_BB_REG(_cfg_::_USART_DR);
 	}
 	
@@ -530,7 +566,11 @@ public:
 		uint8_t* p = (uint8_t*)buf;
 		for( ;size; len++, size--)
 		{
-			while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB)) {}
+			while(IS_BB_REG_RESET(_cfg_::_USART_SR_RXNE_BB))
+			{
+				//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+				//__WFE();
+			}
 			*p++ = READ_BB_REG(_cfg_::_USART_DR);
 		}
 		return len;
@@ -542,7 +582,11 @@ public:
 		uint8_t* p = (uint8_t*)buf;
 		for( ;size; len++, size--)
 		{
-			while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB)) {}
+			while(IS_BB_REG_RESET(_cfg_::_USART_SR_TXE_BB))
+			{
+				//NVIC_ClearPendingIRQ(static_cast<IRQn_Type>(_cfg_::_IRQn));
+				//__WFE();
+			}
 			WRITE_BB_REG(_cfg_::_USART_DR, *p++);
 		}
 		return len;

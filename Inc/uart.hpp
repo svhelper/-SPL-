@@ -151,7 +151,7 @@ typedef enum
 /************************************************************************/
 
 const uint32_t	BAUDRATE_DEF			= 115200UL;		// bod
-const uint32_t	BAUDRATE_ACCURACY_MAX	= 3;			// percentage
+const uint32_t	BAUDRATE_ACCURACY_MAX	= 1;			// percentage
 const uint32_t	ALT_FUNC_ID_DEF			= 0;			// Default - the primary of Alternative GPIO Function
 const uint32_t	ALT_FUNC_ID_AUTO		= 0xFFFFFFFF;	// Auto choosing of Alternative GPIO Function
 const uint32_t	TIMEOUT_INFINITE		= 0xFFFFFFFF;
