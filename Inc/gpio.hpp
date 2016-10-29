@@ -11,6 +11,7 @@
 #include <static_assert.hpp>
 
 #include <_aux_list.hpp>
+#include <adc.hpp>
 
 
 /************************************************************************/
@@ -163,7 +164,9 @@ namespace config {
 				speed::speed	Speed     = speed::low,
 				state::state	DefState  = state::reset,
 				pull::pull		Pull      = pull::no,
-				flag::flag		Flag      = flag::flag_no
+				flag::flag		Flag      = flag::flag_no,
+				class			ADC       = void,
+				sampling_delay_min::sampling_delay_min	SamplingDelayMin		= sampling_delay_min::_default
 			>
 	class config
 	{
@@ -174,11 +177,15 @@ namespace config {
 		static const state::state	_DefState  = DefState;
 		static const pull::pull		_Pull      = Pull    ;
 		static const flag::flag		_Flag      = Flag    ;
+		typedef      ADC			_adc                 ;
+		static const sampling_delay_min::sampling_delay_min	_SamplingDelayMin		= SamplingDelayMin;
 	};
 
-	template <	pin_id::pin_id		PinID
+	template <	pin_id::pin_id		PinID,
+				class				ADC											= void,
+				sampling_delay_min::sampling_delay_min	SamplingDelayMin		= sampling_delay_min::_default
 			>
-	class analog : public config<PinID, mode::analog, speed::low, state::reset, pull::no, flag::flag_no> { };
+	class analog : public config<PinID, mode::analog, speed::low, state::reset, pull::no, flag::flag_no, ADC, SamplingDelayMin> { };
 
 	/************************************************************************/
 	/*                                                                      */
@@ -311,6 +318,7 @@ class gpio
 	, public obj::obj< obj::type_id::gpio, _CFG_::_PinID >
 {
 public:
+	typedef gpio_port< _CFG_ > gpio_port;
 protected:
 	gpio();
 	~gpio();
@@ -323,51 +331,71 @@ private:
 	
 public:
 	template <class sysclock>
+	class on_sysclock_changing
+	{
+	protected:
+		on_sysclock_changing();
+		~on_sysclock_changing();
+	
+	public:
+		static void starting()
+		{
+			// Disable the peripheral
+			gpio_port::template on_sysclock_changing< sysclock >::starting();
+		}
+		static void finished()
+		{
+			// Enable peripheral clock
+			gpio_port::template on_sysclock_changing< sysclock >::finished();
+		}
+	};
+
+	template <class sysclock>
 	static void init()
 	{
-		gpio_port< _CFG_ >::init();
+		gpio_port::init();
 	}
 	
 	static void init()
 	{
-		gpio_port< _CFG_ >::init();
+		gpio_port::init();
 	}
 	
 	static void update()
 	{
-		gpio_port< _CFG_ >::update();
+		gpio_port::update();
 	}
 	
 	static bool get()
 	{
 		// accessible at any time
-		return gpio_port< _CFG_ >::get();
+		return gpio_port::get();
 	}
 	static bool get_out()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		return gpio_port< _CFG_ >::get_out();
+		return gpio_port::get_out();
 	}
 	static void set()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		gpio_port< _CFG_ >::set();
+		gpio_port::set();
 	}
 	static void reset()
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		gpio_port< _CFG_ >::reset();
+		gpio_port::reset();
 	}
 
 	static void write(bool val)
 	{
 		STATIC_ASSERT(_cfg_::_Mode == mode::output, "Accessible in OUTPUT mode");
-		gpio_port< _CFG_ >::write(val);
+		gpio_port::write(val);
 	}
 	static bool read()
 	{
 		// accessible at any time
-		return gpio_port< _CFG_ >::read();
+		return gpio_port::read();
 	}
 	
 	template <state::state NewState>
@@ -390,9 +418,21 @@ public:
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
+template <	pin_id::pin_id		PinID,
+			class				ADC,
+			sampling_delay_min::sampling_delay_min	SamplingDelayMin		= sampling_delay_min::_default
+		>
+class analog
+	: public gpio< config::analog<PinID, ADC, SamplingDelayMin> >
+	, public ::mcu::adc::adc_channel< ADC, gpio< config::analog< PinID, ADC, SamplingDelayMin > >::gpio_port::get_adc_ch::_ChannelID, SamplingDelayMin >
+{ };
+
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
 template <	pin_id::pin_id		PinID
 		>
-class analog : public gpio< config::analog<PinID> > { };
+class unused : public gpio< config::analog<PinID> > { };
 
 /************************************************************************/
 /*                                                                      */
@@ -441,6 +481,18 @@ public:
 	typedef atomic_port< ::aux::list<_VAR_ARGS_LIST()> > _port_;
 
 public:
+	template <class sysclock>
+	class on_sysclock_changing
+	{
+	protected:
+		on_sysclock_changing();
+		~on_sysclock_changing();
+	
+	public:
+		static void starting() { }			// Disable the peripheral
+		static void finished() { }			// Enable peripheral clock
+	};
+
 	template <class sysclock>
 	static void init()		{ _port_::init();	}
 	static void init()		{ _port_::init();	}

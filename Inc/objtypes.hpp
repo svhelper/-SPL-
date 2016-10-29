@@ -55,7 +55,7 @@ typedef enum
 	rtc_alarm,
 	mcu_voltage,
 	mcu_temperature,
-	adc_calibration,
+	adc_channel,
 	spi_target,
 	i2c_target,
 	lcd_cmd,

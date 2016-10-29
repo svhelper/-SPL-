@@ -15,6 +15,7 @@
 //////////////////////////////////////////////////////////////////////////
 #include "CMSIS/Device/ST/STM32F1xx/Include/stm32f1xx.h"
 #include "stm32f1xx/stm32f1xx_registers.hpp"
+#include "stm32f1xx/stm32f1xx_adc.hpp"
 
 
 /************************************************************************/
@@ -481,8 +482,11 @@ private:
 		static const uint32_t _GPIO_ODR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_ODR_BB;
 		static const uint32_t _GPIO_IDR_BB      = stm32::registers::GPIO_REG_TO_BB<PORT, PIN>::_GPIO_IDR_BB;
 	};
-	
+
 public:
+	struct get_adc_ch : public stm32::adc::adc_ch_set < (::mcu::adc::adc_id::adc_id)_CFG_::_adc::obj::_id, ::mcu::adc::channel_id::invalid, _CFG_::_PinID >
+	{ };
+
 	class _port_
 	{
 	public:
@@ -494,7 +498,7 @@ public:
 		static const state::state			_DefPinState	= _CFG_::_DefState;
 		static const pull::pull				_Pull			= _CFG_::_Pull;
 		static const flag::flag				_Flag			= _CFG_::_Flag;
-
+	
 	private:
 		STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Port == stm32::port::inv_address), "The MCU has not defined port:pin configuration");
 		STATIC_ASSERT(FAIL_IF(_PinID != pin_id::invalid && _Pin  == stm32::port::inv_pin    ), "The MCU has not defined port:pin configuration");
@@ -518,6 +522,10 @@ public:
 		static const uint32_t _odr_set   = REG_GPIO::ODR_SET;
 		static const uint32_t _odr_reset = REG_GPIO::ODR_RESET;
 
+		static const uint32_t
+			_adc_smpr1 = 0,
+			_adc_smpr2 = 0;
+
 		typedef stm32::registers::_p$_cfg< IF_GPIOA_EXISTS(((_PinID >= pin_id::PA0 && _PinID <= pin_id::PA31) ? valid : false) ||) false, _crl_mask, _crl_val, _crh_mask, _crh_val, _odr_mask, _odr_val > _pa_cfg;
 		typedef stm32::registers::_p$_cfg< IF_GPIOB_EXISTS(((_PinID >= pin_id::PB0 && _PinID <= pin_id::PB31) ? valid : false) ||) false, _crl_mask, _crl_val, _crh_mask, _crh_val, _odr_mask, _odr_val > _pb_cfg;
 		typedef stm32::registers::_p$_cfg< IF_GPIOC_EXISTS(((_PinID >= pin_id::PC0 && _PinID <= pin_id::PC31) ? valid : false) ||) false, _crl_mask, _crl_val, _crh_mask, _crh_val, _odr_mask, _odr_val > _pc_cfg;
@@ -528,7 +536,7 @@ public:
 		typedef stm32::registers::_p$_cfg< IF_GPIOH_EXISTS(((_PinID >= pin_id::PH0 && _PinID <= pin_id::PH31) ? valid : false) ||) false, _crl_mask, _crl_val, _crh_mask, _crh_val, _odr_mask, _odr_val > _ph_cfg;
 		typedef stm32::registers::_p$_cfg< IF_GPIOI_EXISTS(((_PinID >= pin_id::PI0 && _PinID <= pin_id::PI31) ? valid : false) ||) false, _crl_mask, _crl_val, _crh_mask, _crh_val, _odr_mask, _odr_val > _pi_cfg;
 	};
-	
+
 public:
 	static void init()
 	{
@@ -653,74 +661,74 @@ public:
 /************************************************************************/
 /*                                                                      */
 /************************************************************************/
-
-struct list_gpio_merge
-{
-	typedef ::mcu::obj::obj< ::mcu::obj::type_id::gpio > obj_gpio;
-	
-	template < class L, class R >
-	struct _p$_cfg_merge
-	{
-		static const uint32_t _crl_mask	= L::_crl_mask	| R::_crl_mask	;
-		static const uint32_t _crl_val	= L::_crl_val	| R::_crl_val	;
-		static const uint32_t _crh_mask	= L::_crh_mask	| R::_crh_mask	;
-		static const uint32_t _crh_val	= L::_crh_val	| R::_crh_val	;
-		static const uint32_t _odr_mask	= L::_odr_mask	| R::_odr_mask	;
-		static const uint32_t _odr_val	= L::_odr_val	| R::_odr_val	;
-	};
-	
-	struct _zero : public obj_gpio
-	{
-		struct _port_
-		{
-			static const uint32_t _rcc_apb2enr_mask = 0;
-			static const uint32_t _rcc_apb2enr      = 0;
-
-			typedef stm32::registers::_p$_cfg<false> _pa_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pb_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pc_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pd_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pe_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pf_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pg_cfg;
-			typedef stm32::registers::_p$_cfg<false> _ph_cfg;
-			typedef stm32::registers::_p$_cfg<false> _pi_cfg;
-		};
-	};
-
-	template <class CUR, class NEXT> struct _cb
-	{
-		struct _result : public obj_gpio
-		{
-			//typedef _zero::_port_ _port_;
-			struct _port_
-			{
-				typedef typename ::aux::if_c< CUR ::obj::_type_id == obj_gpio::obj::_type_id, CUR , _zero >::_result ::_port_ _l;
-				typedef typename ::aux::if_c< NEXT::obj::_type_id == obj_gpio::obj::_type_id, NEXT, _zero >::_result ::_port_ _r;
-
-				static const uint32_t _rcc_apb2enr_mask = _l::_rcc_apb2enr_mask | _r::_rcc_apb2enr_mask;
-				static const uint32_t _rcc_apb2enr      = _l::_rcc_apb2enr      | _r::_rcc_apb2enr     ;
-
-				typedef _p$_cfg_merge<typename _l::_pa_cfg, typename _r::_pa_cfg> _pa_cfg;
-				typedef _p$_cfg_merge<typename _l::_pb_cfg, typename _r::_pb_cfg> _pb_cfg;
-				typedef _p$_cfg_merge<typename _l::_pc_cfg, typename _r::_pc_cfg> _pc_cfg;
-				typedef _p$_cfg_merge<typename _l::_pd_cfg, typename _r::_pd_cfg> _pd_cfg;
-				typedef _p$_cfg_merge<typename _l::_pe_cfg, typename _r::_pe_cfg> _pe_cfg;
-				typedef _p$_cfg_merge<typename _l::_pf_cfg, typename _r::_pf_cfg> _pf_cfg;
-				typedef _p$_cfg_merge<typename _l::_pg_cfg, typename _r::_pg_cfg> _pg_cfg;
-				typedef _p$_cfg_merge<typename _l::_ph_cfg, typename _r::_ph_cfg> _ph_cfg;
-				typedef _p$_cfg_merge<typename _l::_pi_cfg, typename _r::_pi_cfg> _pi_cfg;
-			};
-		};
-	};
-};
-
-/************************************************************************/
-/*                                                                      */
-/************************************************************************/
 template < class LIST >
 class atomic_port
 {
+	struct list_gpio_merge
+	{
+		typedef ::mcu::obj::obj< ::mcu::obj::type_id::gpio > obj_gpio;
+		
+		template < class L, class R >
+		struct _p$_cfg_merge
+		{
+			static const uint32_t _crl_mask	= L::_crl_mask	| R::_crl_mask	;
+			static const uint32_t _crl_val	= L::_crl_val	| R::_crl_val	;
+			static const uint32_t _crh_mask	= L::_crh_mask	| R::_crh_mask	;
+			static const uint32_t _crh_val	= L::_crh_val	| R::_crh_val	;
+			static const uint32_t _odr_mask	= L::_odr_mask	| R::_odr_mask	;
+			static const uint32_t _odr_val	= L::_odr_val	| R::_odr_val	;
+		};
+		
+		struct _zero : public obj_gpio
+		{
+			struct _port_
+			{
+				static const uint32_t _rcc_apb2enr_mask = 0;
+				static const uint32_t _rcc_apb2enr      = 0;
+				static const uint32_t _adc_smpr1        = 0;
+				static const uint32_t _adc_smpr2        = 0;
+
+				typedef stm32::registers::_p$_cfg<false> _pa_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pb_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pc_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pd_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pe_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pf_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pg_cfg;
+				typedef stm32::registers::_p$_cfg<false> _ph_cfg;
+				typedef stm32::registers::_p$_cfg<false> _pi_cfg;
+			};
+		};
+
+		template <class CUR, class NEXT> struct _cb
+		{
+			struct _result : public obj_gpio
+			{
+				//typedef _zero::_port_ _port_;
+				struct _port_
+				{
+					typedef typename ::aux::if_c< CUR ::obj::_type_id == obj_gpio::obj::_type_id, CUR , _zero >::_result ::_port_ _l;
+					typedef typename ::aux::if_c< NEXT::obj::_type_id == obj_gpio::obj::_type_id, NEXT, _zero >::_result ::_port_ _r;
+
+					static const uint32_t _rcc_apb2enr_mask = _l::_rcc_apb2enr_mask | _r::_rcc_apb2enr_mask;
+					static const uint32_t _rcc_apb2enr      = _l::_rcc_apb2enr      | _r::_rcc_apb2enr     ;
+					static const uint32_t _adc_smpr1        = _l::_adc_smpr1        | _r::_adc_smpr1       ;
+					static const uint32_t _adc_smpr2        = _l::_adc_smpr2        | _r::_adc_smpr2       ;
+
+					typedef _p$_cfg_merge<typename _l::_pa_cfg, typename _r::_pa_cfg> _pa_cfg;
+					typedef _p$_cfg_merge<typename _l::_pb_cfg, typename _r::_pb_cfg> _pb_cfg;
+					typedef _p$_cfg_merge<typename _l::_pc_cfg, typename _r::_pc_cfg> _pc_cfg;
+					typedef _p$_cfg_merge<typename _l::_pd_cfg, typename _r::_pd_cfg> _pd_cfg;
+					typedef _p$_cfg_merge<typename _l::_pe_cfg, typename _r::_pe_cfg> _pe_cfg;
+					typedef _p$_cfg_merge<typename _l::_pf_cfg, typename _r::_pf_cfg> _pf_cfg;
+					typedef _p$_cfg_merge<typename _l::_pg_cfg, typename _r::_pg_cfg> _pg_cfg;
+					typedef _p$_cfg_merge<typename _l::_ph_cfg, typename _r::_ph_cfg> _ph_cfg;
+					typedef _p$_cfg_merge<typename _l::_pi_cfg, typename _r::_pi_cfg> _pi_cfg;
+				};
+			};
+		};
+	};
+
 	struct __port_helper
 	{
 		template <uint32_t PORT, class CFG>
@@ -773,6 +781,18 @@ public:
 	typedef typename pins::template traverse<list_gpio_merge>::_result::_port_ pins_cfg;
 
 public:
+	template <class sysclock>
+	class on_sysclock_changing
+	{
+	protected:
+		on_sysclock_changing();
+		~on_sysclock_changing();
+	
+	public:
+		static void starting() { }			// Disable the peripheral
+		static void finished() { }			// Enable peripheral clock
+	};
+
 	static void init()
 	{
 		// enable GPIO clock

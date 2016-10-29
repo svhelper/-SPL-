@@ -83,6 +83,74 @@
 //	--------##---+------+--+-----+------+------+-----+------+----------+----------+
 
 
+/************************************************************************/
+/*                                                                      */
+/************************************************************************/
+#define DEFINE_ADCS(CMD)									\
+/*	------------##---+------+----+--------+----------+*/	\
+/*	DEF_ADC_CFG_##CMD|  ID  |Bits|   DMA  |   DmaCh  |*/	\
+/*	------------##---+------+----+--------+----------+*/	\
+	DEF_ADC_CFG_##CMD( adc_1,  12,   dma_1, channel_1)		\
+	DEF_ADC_CFG_##CMD( adc_2,  12, invalid,   invalid)		\
+	DEF_ADC_CFG_##CMD( adc_3,  12,   dma_2, channel_5)		\
+/*	------------##---+------+----+--------+----------+*/	\
+															\
+/*	------------##---+------+-----------+------+*/			\
+/*	 DEF_ADC_CH_##CMD|  ID  |  CHANNEL  | GPIO |*/			\
+/*	------------##---+------+-----------+------+*/			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_0 ,  PA0 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_1 ,  PA1 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_2 ,  PA2 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_3 ,  PA3 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_4 ,  PA4 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_5 ,  PA5 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_6 ,  PA6 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_7 ,  PA7 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_8 ,  PB0 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_9 ,  PB1 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_10,  PC0 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_11,  PC1 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_12,  PC2 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_13,  PC3 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_14,  PC4 )			\
+	 DEF_ADC_CH_##CMD( adc_1, channel_15,  PC5 )			\
+															\
+	 DEF_ADC_CH_##CMD( adc_2, channel_0 ,  PA0 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_1 ,  PA1 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_2 ,  PA2 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_3 ,  PA3 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_4 ,  PA4 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_5 ,  PA5 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_6 ,  PA6 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_7 ,  PA7 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_8 ,  PB0 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_9 ,  PB1 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_10,  PC0 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_11,  PC1 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_12,  PC2 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_13,  PC3 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_14,  PC4 )			\
+	 DEF_ADC_CH_##CMD( adc_2, channel_15,  PC5 )			\
+															\
+	 DEF_ADC_CH_##CMD( adc_3, channel_0 ,  PA0 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_1 ,  PA1 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_2 ,  PA2 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_3 ,  PA3 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_4 ,  PF6 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_5 ,  PF7 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_6 ,  PF8 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_7 ,  PF9 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_8 ,  PF10)			\
+	 /*DEF_ADC_CH_##CMD( adc_3, channel_9 ,invalid)*/		\
+	 DEF_ADC_CH_##CMD( adc_3, channel_10,  PC0 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_11,  PC1 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_12,  PC2 )			\
+	 DEF_ADC_CH_##CMD( adc_3, channel_13,  PC3 )			\
+	 /*DEF_ADC_CH_##CMD( adc_3, channel_14,invalid)*/		\
+	 /*DEF_ADC_CH_##CMD( adc_3, channel_15,invalid)*/		\
+/*	------------##---+------+-----------+------+*/			\
+
+
 
 /************************************************************************/
 /*                                                                      */
@@ -92,19 +160,22 @@
 #include <static_assert.hpp>
 
 //////////////////////////////////////////////////////////////////////////
+#include "clock.hpp"
 #include "gpio.hpp"
 #include "dma.hpp"
 #include "uart.hpp"
 #include "spi.hpp"
+#include "adc.hpp"
 
 //////////////////////////////////////////////////////////////////////////
 //#include <stm32f1xx.h>
 #include __METALLL_PORT(registers.hpp)
 #include __METALLL_PORT(clock.hpp)
 #include __METALLL_PORT(gpio.hpp)
+#include __METALLL_PORT(dma.hpp)
 #include __METALLL_PORT(uart.hpp)
 #include __METALLL_PORT(spi.hpp)
-//#include __METALLL_PORT(dma.hpp)
+#include __METALLL_PORT(adc.hpp)
 #include __METALLL_PORT(mcu.hpp)
 
 /************************************************************************/

@@ -16,14 +16,20 @@
 #include <_aux_list.hpp>
 
 //////////////////////////////////////////////////////////////////////////
+#include <mcu_cfg.hpp>
+
+//////////////////////////////////////////////////////////////////////////
 #include <objtypes.hpp>
 #include <gpio.hpp>
 #include <dma.hpp>
 #include <clock.hpp>
+#include <uart.hpp>
+#include <spi.hpp>
+#include <adc.hpp>
 
 //////////////////////////////////////////////////////////////////////////
-#include <mcu_cfg.hpp>
-
+// Include the main header for selected MCU
+#include __METALLL_PORT(.hpp)
 
 /************************************************************************/
 /*                                                                      */
@@ -50,6 +56,12 @@ public:
 	static void init()
 	{
 		_port_::init();
+	}
+	
+	template< typename sysclock_new >
+	static void switch_sysclock()
+	{
+		_port_::template switch_sysclock<sysclock_new>();
 	}
 };
 
