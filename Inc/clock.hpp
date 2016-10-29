@@ -92,6 +92,13 @@ typedef pll_hse_bypass	< state::enable > pll_hse_bypass_def;
 
 //////////////////////////////////////////////////////////////////////////	
 template<
+		class		ClockSource									,
+		uint32_t	CortexSysTimer_ms			= 1000			,
+		uint32_t	Clock_Hz_Max				= CLOCK_HZ_DEF	
+	>
+class sysclock_auto;
+
+template<
 		class		ClockSource,
 		uint32_t	CortexSysTimer_ms = 1000
 	>

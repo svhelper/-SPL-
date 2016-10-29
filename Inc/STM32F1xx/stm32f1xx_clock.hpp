@@ -97,7 +97,7 @@ namespace clock {
 				(_State == ::mcu::clock::state::enable) ? start() : stop();
 				
 				/* Adjusts the Internal High Speed oscillator (HSI) calibration value.*/
-				MODIFY_REG(RCC->CR, RCC_CR_HSITRIM, (uint32_t)_Calibration << RCC_CR_HSITRIM_Pos);
+				MODIFY_REG(RCC->CR, RCC_CR_HSITRIM_Msk, (uint32_t)_Calibration << RCC_CR_HSITRIM_Pos);
 			}
 			
 			static void enable(::mcu::clock::state::state new_state)
@@ -723,10 +723,10 @@ namespace clock {
 			
 			static void start()
 			{
-				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Pos) == RCC_CFGR_SWS_PLL)
-				{
-					return;
-				}
+//				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Msk) == RCC_CFGR_SWS_PLL)
+//				{
+//					return;
+//				}
 				
 				// enabling
 				osc::start();
@@ -738,7 +738,7 @@ namespace clock {
 				while(IS_BB_REG_SET(_RCC_CR_PLLRDY_BB)) {}
 
 				/* Configure the main PLL clock source and multiplication factors. */
-				MODIFY_REG(RCC->CFGR, (RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL), ((0 /*RCC_CFGR_PLLSRC*/) | ((_pll_mul - 2) << RCC_CFGR_PLLMULL_Pos) ));
+				MODIFY_REG(RCC->CFGR, (RCC_CFGR_PLLSRC_Msk | RCC_CFGR_PLLMULL_Msk), ((0 /*RCC_CFGR_PLLSRC*/) | ((_pll_mul - 2) << RCC_CFGR_PLLMULL_Pos) ));
 
 				/* Enable the main PLL. */
 				SET_BB_REG(_RCC_CR_PLLON_BB);
@@ -803,10 +803,10 @@ namespace clock {
 			
 			static void start()
 			{
-				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Pos) == RCC_CFGR_SWS_PLL)
-				{
-					return;
-				}
+//				if(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Msk) == RCC_CFGR_SWS_PLL)
+//				{
+//					return;
+//				}
 				
 				// enabling
 				osc::start();
@@ -819,10 +819,10 @@ namespace clock {
 
 				/* Set PREDIV1 Value */
 				WRITE_BB_REG(_RCC_CFGR_PLLXTPRE_BB, _pll_prediv == 1 ? 0 : 1);
-				//MODIFY_REG(RCC->CFGR, RCC_CFGR_PLLXTPRE, (uint32_t)(pll_prediv == 1 ? 0 : RCC_CFGR_PLLXTPRE));
+				//MODIFY_REG(RCC->CFGR, RCC_CFGR_PLLXTPRE_Msk, (uint32_t)(pll_prediv == 1 ? 0 : RCC_CFGR_PLLXTPRE));
 				
 				/* Configure the main PLL clock source and multiplication factors. */
-				MODIFY_REG(RCC->CFGR, (RCC_CFGR_PLLSRC | RCC_CFGR_PLLMULL), ((RCC_CFGR_PLLSRC) | ((_pll_mul - 2) << RCC_CFGR_PLLMULL_Pos) ));
+				MODIFY_REG(RCC->CFGR, (RCC_CFGR_PLLSRC_Msk | RCC_CFGR_PLLMULL_Msk), ((RCC_CFGR_PLLSRC) | ((_pll_mul - 2) << RCC_CFGR_PLLMULL_Pos) ));
 
 				/* Enable the main PLL. */
 				SET_BB_REG(_RCC_CR_PLLON_BB);
@@ -1093,11 +1093,11 @@ namespace clock {
 
 #if defined(FLASH_ACR_LATENCY)
 				// Set maximal safe FLASH LATENCY during switching
-				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, 2);
+				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY_Msk, 2 << FLASH_ACR_LATENCY_Pos);
 #endif /* FLASH_ACR_LATENCY */
 
 				// HCLK Configuration
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_HPRE, _rcc_cfgr_hpre_div);
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_HPRE_Msk, _rcc_cfgr_hpre_div);
 				
 				// SYSCLK Configuration
 				osc::init();														// Clock Source Initialization
@@ -1131,19 +1131,19 @@ namespace clock {
 				// 	STATIC_ASSERT(false, "internal error: Invalid Clock Source type");
 				// }
 
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_SW, _rcc_cfgr_sw);					// Switching to Clock Source
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_SW_Msk, _rcc_cfgr_sw);					// Switching to Clock Source
 				
-				while(READ_BIT(RCC->CFGR, RCC_CFGR_SWS) != _rcc_cfgr_sws) {}		// Waiting for finalization
+				while(READ_BIT(RCC->CFGR, RCC_CFGR_SWS_Msk) != _rcc_cfgr_sws) {}		// Waiting for finalization
 
 #if defined(FLASH_ACR_LATENCY)
-				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY, _flash_acr_latency);		// Initialization FLASH LATENCY
+				MODIFY_REG(FLASH->ACR, FLASH_ACR_LATENCY_Msk, _flash_acr_latency);		// Initialization FLASH LATENCY
 #endif /* FLASH_ACR_LATENCY */
 
 				// PCLK1 Configuration
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE1, _rcc_cfgr_ppre1);
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE1_Msk, _rcc_cfgr_ppre1);
 
 				// PCLK2 Configuration
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE2, _rcc_cfgr_ppre2);
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_PPRE2_Msk, _rcc_cfgr_ppre2);
 
 				// Configure the SysTick to have interrupt in 1ms time basis
 				SysTick_Config(_CortexSysTimer_load);
@@ -1155,10 +1155,10 @@ namespace clock {
 				//NVIC_SetPriority(SysTick_IRQn, NVIC_EncodePriority(NVIC_PRIORITYGROUP /*NVIC_GetPriorityGrouping()*/, TICK_INT_PRIORITY, 0));
 
 				// Configure the ADC clock source
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_ADCPRE, _rcc_cfgr_adcpre);
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_ADCPRE_Msk, _rcc_cfgr_adcpre);
 
 				// Configure the USB clock source
-				MODIFY_REG(RCC->CFGR, RCC_CFGR_USBPRE, _rcc_cfgr_usbpre);
+				MODIFY_REG(RCC->CFGR, RCC_CFGR_USBPRE_Msk, _rcc_cfgr_usbpre);
 			}
 		};
 		
@@ -1233,14 +1233,15 @@ class pll_usb_max : public ::mcu::stm32::clock::pll_auto_range< OSC, ClockMin_Hz
 
 //////////////////////////////////////////////////////////////////////////	
 template<
-		class		ClockSource																,
-		uint32_t	CortexSysTimer_ms			= 1000										,
-		uint32_t	HCLK_Max_Hz					= ::mcu::stm32::clock::limits::max::HCLK	,
-		uint32_t	APB1CLK_Max_Hz				= ::mcu::stm32::clock::limits::max::APB1CLK	,
-		uint32_t	APB2CLK_Max_Hz				= ::mcu::stm32::clock::limits::max::APB2CLK	,
-		uint32_t	ADCCLK_Max_Hz				= ::mcu::stm32::clock::limits::max::ADCCLK	
+		class		ClockSource			,
+		uint32_t	CortexSysTimer_ms	,
+		uint32_t	Clock_Hz_Max		
 	>
-class sysclock_auto : public ::mcu::stm32::clock::sysclock_auto< ClockSource, HCLK_Max_Hz, APB1CLK_Max_Hz, APB2CLK_Max_Hz, 1000000/*Hz*/ / CortexSysTimer_ms, ADCCLK_Max_Hz > {};
+class sysclock_auto : public ::mcu::stm32::clock::sysclock_auto< ClockSource, Clock_Hz_Max,
+	::mcu::stm32::clock::limits::max::APB1CLK, ::mcu::stm32::clock::limits::max::APB2CLK,
+	1000000/*Hz*/ / CortexSysTimer_ms,
+	::mcu::stm32::clock::limits::max::ADCCLK >
+{};
 
 template<
 		class		ClockSource,
